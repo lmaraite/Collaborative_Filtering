@@ -40,7 +40,4 @@ def get_neighbors(key_id: int, element_id: int, data: dataset) -> list:
 
 def get_nearest_neighbors(max_nearest_neighbors: int , key_id: int, element_id: int, data: dataset) -> list:
     neighbors = sorted(get_neighbors(key_id, element_id, data), reverse=True)
-    if len(neighbors) <= max_nearest_neighbors:
-        return neighbors
-    else:
-        return neighbors[:max_nearest_neighbors]
+    return neighbors[:max_nearest_neighbors]

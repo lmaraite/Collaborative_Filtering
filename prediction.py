@@ -50,18 +50,23 @@ def predicition_pearson_correlation(key_id: int, element_id: int, data: dataset)
     return counter / denominator
 
 
-def get_top_n_list(n: int, user_id, data: dataset) -> dict:
+def get_top_n_list(n: int, user_id, data: dataset) -> list:
     top_n = {}
-    for it in range(0, len(data.rating_matrix)-1):
+    for it in range(0, len(data.rating_matrix)):
         if not has_rated(it, user_id, data.is_rated_matrix):
-            top_n.default(it)
             top_n[it] = predicition_cosine_similarity(it, user_id, data)
-    top_n = sorted(top_n, key=lambda kv: kv[1], reverse=True)
-    return top_n
+    top_n = sorted(top_n.items(), key=lambda item: item[1], reverse=True)
+    return top_n[:n]
 
 
 test_data = dataset(similarity_matrix, rating_matrix, is_rated_matrix)
-print(get_top_n_list(1, 0, test_data))
+top_n_list = get_top_n_list(10, 0, test_data)
+for it in top_n_list:
+    print("--------------------")
+    print("movie_id:          "+str(it[0]))
+    print("rating_prediction: "+str(it[1]))
+    print("--------------------")
+
 
 
 """
