@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from data import dataset
-from neighborhood import get_nearest_neighbors
+from neighborhood import get_nearest_neighbors, has_rated
 import numpy as np
 
 """
@@ -50,5 +50,25 @@ def predicition_pearson_correlation(key_id: int, element_id: int, data: dataset)
     return counter / denominator
 
 
+def get_top_n_list(n: int, user_id, data: dataset) -> dict:
+    top_n = {}
+    for it in range(0, len(data.rating_matrix)-1):
+        if not has_rated(it, user_id, data.is_rated_matrix):
+            top_n.default(it)
+            top_n[it] = predicition_cosine_similarity(it, user_id, data)
+    top_n = sorted(top_n, key=lambda kv: kv[1], reverse=True)
+    return top_n
+
+
 test_data = dataset(similarity_matrix, rating_matrix, is_rated_matrix)
-print(predicition_pearson_correlation(4, 0, test_data))
+print(get_top_n_list(1, 0, test_data))
+
+
+"""
+
+
+
+
+
+
+"""
