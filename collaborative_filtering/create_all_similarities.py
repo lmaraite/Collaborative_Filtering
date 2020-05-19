@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import numpy as np
 from similarity import create_similarity_matrix
 import timeit

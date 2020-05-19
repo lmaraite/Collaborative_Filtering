@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
 import numpy as np
 from numpy.linalg import norm
 import itertools
+from progressbar import print_progressbar
 
 # TODO: Implement further functions to tidy up the code.
 # TODO: Search for the problems causing the RuntimeWarning when computing item-based adjusted cosine.
@@ -14,8 +16,9 @@ import itertools
 def create_similarity_matrix(all_ratings, is_rated, mode):
     side_length = all_ratings.shape[0]
     similarity_matrix = np.full((side_length, side_length), np.nan)
+    print_progressbar(0, side_length, prefix=mode + " Progress: ", suffix="Complete", length=100)
     for element1, element2 in itertools.product(range(side_length), range(side_length)):
-        print(str(element1) + "/" + str(range(side_length)))
+        print_progressbar(element1, side_length, prefix=mode + " Progress: ", suffix="Complete", length=100)
         if np.isnan(similarity_matrix[element1, element2]):
             similarity_matrix[element1, element2] = get_similarity((element1, element2), all_ratings, is_rated, mode)
             similarity_matrix[element2, element1] = similarity_matrix[element1, element2]
