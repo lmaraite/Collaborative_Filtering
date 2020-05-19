@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 from data import dataset
+import math
 
 """
 Item based:
@@ -31,11 +32,11 @@ def has_rated(key_id: int, element_id: int, is_rated_matrix: np.ndarray) -> bool
 def get_neighbors(key_id: int, element_id: int, data: dataset) -> list:
     neighbors = []
     for it_key_id in range(0, len(data.similarity_matrix)-1):  # it = iterator
-        if has_rated(it_key_id, element_id, data.is_rated_matrix):
+        if has_rated(it_key_id, element_id, data.is_rated_matrix) and not math.isnan(data.similarity_matrix[key_id][it_key_id]):
             neighbors.append(Neighbor(data.rating_matrix[it_key_id][element_id]
-                                      , it_key_id
-                                      , data.similarity_matrix[key_id][it_key_id], 0))  # pearson_average wird standartmäßig auf
-    return neighbors                                                                    # 0 gesetzt und später in der prediction initialisiert
+                            , it_key_id
+                            , data.similarity_matrix[key_id][it_key_id], 0))  # pearson_average wird standartmäßig auf
+    return neighbors                                                          # 0 gesetzt und später in der prediction initialisiert
 
 
 def get_nearest_neighbors(max_nearest_neighbors: int , key_id: int, element_id: int, data: dataset) -> list:

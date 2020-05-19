@@ -2,6 +2,7 @@
 from data import dataset
 from neighborhood import get_nearest_neighbors, has_rated
 import numpy as np
+import math
 
 """
 Item based:
@@ -13,21 +14,22 @@ User based:
     element_id = movie_id
 """
 
-MAX_NEAREST_NEIGHBORS = 3
+MAX_NEAREST_NEIGHBORS = 10
 
 
-similarity_matrix = np.genfromtxt("small-dataset/cosine-similarity-matrix.csv", delimiter=",")
-rating_matrix = np.genfromtxt("small-dataset/R.csv", delimiter=",")
-is_rated_matrix = np.genfromtxt("small-dataset/Y.csv", delimiter=",").astype(bool)
+similarity_matrix = np.genfromtxt("../output/item_based_adjusted_cosine_similarity_matrix.csv", delimiter=",")
+rating_matrix = np.genfromtxt("../dataset/R.csv", delimiter=",")
+is_rated_matrix = np.genfromtxt("../dataset/Y.csv", delimiter=",").astype(bool)
 
 
 def predicition_cosine_similarity(key_id: int, element_id: int, data: dataset) -> float:
     nearest_neighbors = get_nearest_neighbors(MAX_NEAREST_NEIGHBORS, key_id, element_id, data)
-    counter = 0
-    denominator = 0
+    counter, denominator = 0, 0
     for it in nearest_neighbors:
         counter += it.similarity * it.rating
         denominator += it.similarity
+    if denominator is 0:
+        return 0
     return counter / denominator
 
 
@@ -60,12 +62,11 @@ def get_top_n_list(n: int, user_id, data: dataset) -> list:
 
 
 test_data = dataset(similarity_matrix, rating_matrix, is_rated_matrix)
-print(predicition_cosine_similarity(4, 0, test_data))
-"""
-top_n_list = get_top_n_list(5, 0, test_data)
+
+top_n_list = get_top_n_list(10, 0, test_data)
 for it in top_n_list:
     print("--------------------")
     print("movie_id:          "+str(it[0]))
     print("rating_prediction: "+str(it[1]))
     print("--------------------")
-"""
+
