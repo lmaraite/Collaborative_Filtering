@@ -11,8 +11,8 @@ import timeit
 global_start_time = timeit.default_timer()
 
 # Loading R (item_ratings) and Y (is_rated).
-item_based_ratings = np.genfromtxt("/home/dennis/PycharmProjects/Collaborative_Filtering/dataset/R.csv", delimiter=',')
-is_rated = np.genfromtxt("/home/dennis/PycharmProjects/Collaborative_Filtering/dataset/Y.csv", delimiter=',')
+item_based_ratings = np.genfromtxt("../dataset/R.csv", delimiter=',')
+is_rated = np.genfromtxt("../dataset/Y.csv", delimiter=',')
 
 global_elapsed_time = timeit.default_timer() - global_start_time
 print("The program has taken " + str(global_elapsed_time) + " seconds to load the data.")
@@ -23,8 +23,8 @@ algorithms = ["cosine", "adjusted_cosine", "pearson"]
 for algorithm in algorithms:
     local_start_time = timeit.default_timer()
     similarity_matrix = create_similarity_matrix(item_based_ratings, is_rated, algorithm)
-    np.savetxt("/home/dennis/PycharmProjects/Collaborative_Filtering/dennis/output/"
-               "item_based_" + algorithm + "_similarity_matrix.csv", similarity_matrix, delimiter=",")
+    np.savetxt("../output/"
+               "item_based_" + algorithm + "_similarity_matrix.csv", similarity_matrix, delimiter=",", fmt="%s")
 
     local_elapsed_time = timeit.default_timer() - local_start_time
     print("The program has taken " + str(local_elapsed_time) + " seconds to create and save the item-based " + algorithm + "-matrix.")
@@ -37,8 +37,8 @@ has_rated = is_rated.T
 for algorithm in algorithms:
     local_start_time = timeit.default_timer()
     similarity_matrix = create_similarity_matrix(user_based_ratings, has_rated, algorithm)
-    np.savetxt("/home/dennis/PycharmProjects/Collaborative_Filtering/dennis/output/"
-               "user_based_" + algorithm + "_similarity_matrix.csv", similarity_matrix, delimiter=",")
+    np.savetxt("../output/"
+               "user_based_" + algorithm + "_similarity_matrix.csv", similarity_matrix, delimiter=",", fmt="%s")
 
     local_elapsed_time = timeit.default_timer() - local_start_time
     print("The program has taken " + str(local_elapsed_time) + " seconds to create and save the user-based " + algorithm + "-matrix.")
