@@ -1,5 +1,5 @@
 import numpy as np
-from src.similarity import create_similarity_matrix
+from similarity import create_similarity_matrix
 import timeit
 
 # TODO: Implement additional functions to tidy up the code.
@@ -49,10 +49,11 @@ print("The program has taken " + str(global_elapsed_time) + " seconds to execute
 
 # For testing purposes only. Will print single similarities between elements.
 '''
-elements_ids = (0, 0)
+elements_ids = (0, 467)
 
 print("The similarities between the elements " + str(elements_ids) + " are:")
-print("cosine:\t\t\t\t" + str(get_similarity(elements_ids, ratings, is_rated, "cosine")))
-print("adjusted cosine:\t" + str(get_similarity(elements_ids, ratings, is_rated, "adjusted_cosine")))
-print("pearson:\t\t\t" + str(get_similarity(elements_ids, ratings, is_rated, "pearson")))
+print("cosine:\t\t\t\t" + str(get_similarity(elements_ids, item_based_ratings, is_rated, "cosine")))
+print("adjusted cosine:\t" + str(get_similarity(elements_ids, item_based_ratings, is_rated, "adjusted_cosine")))
+print("pearson:\t\t\t" + str(get_similarity(elements_ids, item_based_ratings, is_rated, "pearson")))
+
 '''

@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.linalg import norm
 import itertools
+import warnings
 
 # TODO: Implement further functions to tidy up the code.
 # TODO: Search for the problems causing the RuntimeWarning when computing item-based adjusted cosine.
@@ -65,7 +66,6 @@ def less_than_two_co_ratings(co_ratings):
     cosine. Defaults to cosine if the mode is unknown. 
     Returns the algorithm-adjusted co_ratings.
 '''
-# TODO: Fall else ist unnoetig, weil die Eingabe mit try,except schon im Hauptprogramm ueberprueft werden sollte.
 def get_adjusted_co_ratings(elements_ids, all_ratings, co_ratings, mode):
     if (mode == "adjusted_cosine"):
         return convert_to_adjusted_cosine(elements_ids, all_ratings, co_ratings)
