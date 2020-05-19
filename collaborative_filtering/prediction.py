@@ -16,9 +16,9 @@ User based:
 MAX_NEAREST_NEIGHBORS = 3
 
 
-similarity_matrix = np.genfromtxt("small-dataset/cosine-similarity-matrix.csv", delimiter=",")
-rating_matrix = np.genfromtxt("small-dataset/R.csv", delimiter=",")
-is_rated_matrix = np.genfromtxt("small-dataset/Y.csv", delimiter=",").astype(bool)
+similarity_matrix = np.genfromtxt("../dataset/cosine-similarity-matrix.csv", delimiter=",")
+rating_matrix = np.genfromtxt("../dataset/R.csv", delimiter=",")
+is_rated_matrix = np.genfromtxt("../dataset/Y.csv", delimiter=",").astype(bool)
 
 
 def predicition_cosine_similarity(key_id: int, element_id: int, data: dataset) -> float:
@@ -60,7 +60,7 @@ def get_top_n_list(n: int, user_id, data: dataset) -> list:
 
 
 test_data = dataset(similarity_matrix, rating_matrix, is_rated_matrix)
-print(predicition_cosine_similarity(4, 0, test_data))
+print(predicition_cosine_similarity(0, 4, test_data))
 """
 top_n_list = get_top_n_list(5, 0, test_data)
 for it in top_n_list:
