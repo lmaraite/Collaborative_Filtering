@@ -28,7 +28,7 @@ def predicition_cosine_similarity(key_id: int, element_id: int, data: dataset) -
     for it in nearest_neighbors:
         counter += it.similarity * it.rating
         denominator += it.similarity
-    if denominator is 0:
+    if denominator == 0:
         return 0
     return counter / denominator
 
