@@ -60,20 +60,12 @@ def get_top_n_list(n: int, user_id, data: dataset) -> list:
 
 
 test_data = dataset(similarity_matrix, rating_matrix, is_rated_matrix)
-top_n_list = get_top_n_list(10, 0, test_data)
+print(predicition_cosine_similarity(4, 0, test_data))
+"""
+top_n_list = get_top_n_list(5, 0, test_data)
 for it in top_n_list:
     print("--------------------")
     print("movie_id:          "+str(it[0]))
     print("rating_prediction: "+str(it[1]))
     print("--------------------")
-
-
-
-"""
-
-
-
-
-
-
 """
