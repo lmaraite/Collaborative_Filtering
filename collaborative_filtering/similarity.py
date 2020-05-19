@@ -15,6 +15,7 @@ def create_similarity_matrix(all_ratings, is_rated, mode):
     side_length = all_ratings.shape[0]
     similarity_matrix = np.full((side_length, side_length), np.nan)
     for element1, element2 in itertools.product(range(side_length), range(side_length)):
+        print(str(element1) + "/" + str(range(side_length)))
         if np.isnan(similarity_matrix[element1, element2]):
             similarity_matrix[element1, element2] = get_similarity((element1, element2), all_ratings, is_rated, mode)
             similarity_matrix[element2, element1] = similarity_matrix[element1, element2]
