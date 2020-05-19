@@ -32,19 +32,11 @@ def has_rated(key_id: int, element_id: int, is_rated_matrix: np.ndarray) -> bool
 def get_neighbors(key_id: int, element_id: int, data: dataset) -> list:
     neighbors = []
     for it_key_id in range(0, len(data.similarity_matrix)-1):  # it = iterator
-<<<<<<< HEAD:neighborhood.py
         if has_rated(it_key_id, element_id, data.is_rated_matrix) and math.isnan(data.similarity_matrix[key_id][it_key_id]) == False:
-            neighbors.append(neighbor(data.rating_matrix[it_key_id][element_id]
+            neighbors.append(Neighbor(data.rating_matrix[it_key_id][element_id]
                             , it_key_id
                             , data.similarity_matrix[key_id][it_key_id], 0))  # pearson_average wird standartmäßig auf
     return neighbors                                                          # 0 gesetzt und später in der prediction initialisiert
-=======
-        if has_rated(it_key_id, element_id, data.is_rated_matrix):
-            neighbors.append(Neighbor(data.rating_matrix[it_key_id][element_id]
-                                      , it_key_id
-                                      , data.similarity_matrix[key_id][it_key_id], 0))  # pearson_average wird standartmäßig auf
-    return neighbors                                                                    # 0 gesetzt und später in der prediction initialisiert
->>>>>>> 45674a75badb26cd16ff388aa3bbcd965d7d6017:collaborative_filtering/neighborhood.py
 
 
 def get_nearest_neighbors(max_nearest_neighbors: int , key_id: int, element_id: int, data: dataset) -> list:

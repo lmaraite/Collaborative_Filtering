@@ -17,9 +17,9 @@ User based:
 MAX_NEAREST_NEIGHBORS = 10
 
 
-similarity_matrix = np.genfromtxt("dataset/cosine-similarity-matrix.csv", delimiter=",")
-rating_matrix = np.genfromtxt("dataset/R.csv", delimiter=",")
-is_rated_matrix = np.genfromtxt("dataset/Y.csv", delimiter=",").astype(bool)
+similarity_matrix = np.genfromtxt("../dataset/cosine-similarity-matrix.csv", delimiter=",")
+rating_matrix = np.genfromtxt("../dataset/R.csv", delimiter=",")
+is_rated_matrix = np.genfromtxt("../dataset/Y.csv", delimiter=",").astype(bool)
 
 
 def predicition_cosine_similarity(key_id: int, element_id: int, data: dataset) -> float:
@@ -29,15 +29,6 @@ def predicition_cosine_similarity(key_id: int, element_id: int, data: dataset) -
     for it in nearest_neighbors:
         counter += it.similarity * it.rating
         denominator += it.similarity
-
-        """
-        print("sim: "+str(it.similarity))
-        print(math.isnan(it.similarity))
-        print("id:  "+str(it.key_id))
-        print("r:   "+str(it.rating))
-        print("---")
-        """
-
     prediction = counter / denominator
     if denominator == 0:
         prediction = 0
@@ -73,36 +64,4 @@ def get_top_n_list(n: int, user_id, data: dataset) -> list:
 
 
 test_data = dataset(similarity_matrix, rating_matrix, is_rated_matrix)
-<<<<<<< HEAD:prediction.py
-
-nan_prediction = 295
-not_nan_prediction = 287
-
-#print(predicition_cosine_similarity(nan_prediction,0,test_data))
-#for n in range(0,30):
-#    print(has_rated(0,n,test_data.is_rated_matrix))
-
-
-#"""
-top_n_list = get_top_n_list(20, 0, test_data)
-=======
 print(predicition_cosine_similarity(4, 0, test_data))
-"""
-top_n_list = get_top_n_list(5, 0, test_data)
->>>>>>> 45674a75badb26cd16ff388aa3bbcd965d7d6017:collaborative_filtering/prediction.py
-for it in top_n_list:
-    print("--------------------")
-    print("movie_id:          "+str(it[0]))
-    print("rating_prediction: "+str(it[1]))
-    print("--------------------")
-<<<<<<< HEAD:prediction.py
-
-
-
-
-
-
-#"""
-=======
-"""
->>>>>>> 45674a75badb26cd16ff388aa3bbcd965d7d6017:collaborative_filtering/prediction.py
