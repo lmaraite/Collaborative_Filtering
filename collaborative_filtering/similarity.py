@@ -1,7 +1,6 @@
 import numpy as np
 from numpy.linalg import norm
 import itertools
-import warnings
 
 # TODO: Implement further functions to tidy up the code.
 # TODO: Search for the problems causing the RuntimeWarning when computing item-based adjusted cosine.
