@@ -2,6 +2,7 @@
 from data import dataset
 from neighborhood import get_nearest_neighbors, has_rated
 import numpy as np
+import math
 
 """
 Item based:
@@ -13,12 +14,12 @@ User based:
     element_id = movie_id
 """
 
-MAX_NEAREST_NEIGHBORS = 3
+MAX_NEAREST_NEIGHBORS = 10
 
 
-similarity_matrix = np.genfromtxt("small-dataset/cosine-similarity-matrix.csv", delimiter=",")
-rating_matrix = np.genfromtxt("small-dataset/R.csv", delimiter=",")
-is_rated_matrix = np.genfromtxt("small-dataset/Y.csv", delimiter=",").astype(bool)
+similarity_matrix = np.genfromtxt("dataset/cosine-similarity-matrix.csv", delimiter=",")
+rating_matrix = np.genfromtxt("dataset/R.csv", delimiter=",")
+is_rated_matrix = np.genfromtxt("dataset/Y.csv", delimiter=",").astype(bool)
 
 
 def predicition_cosine_similarity(key_id: int, element_id: int, data: dataset) -> float:
@@ -28,7 +29,19 @@ def predicition_cosine_similarity(key_id: int, element_id: int, data: dataset) -
     for it in nearest_neighbors:
         counter += it.similarity * it.rating
         denominator += it.similarity
-    return counter / denominator
+
+        """
+        print("sim: "+str(it.similarity))
+        print(math.isnan(it.similarity))
+        print("id:  "+str(it.key_id))
+        print("r:   "+str(it.rating))
+        print("---")
+        """
+
+    prediction = counter / denominator
+    if denominator == 0:
+        prediction = 0
+    return prediction
 
 
 def add_pearson_average(key_id: int, nearest_neighbors: list, data: dataset):
@@ -60,7 +73,17 @@ def get_top_n_list(n: int, user_id, data: dataset) -> list:
 
 
 test_data = dataset(similarity_matrix, rating_matrix, is_rated_matrix)
-top_n_list = get_top_n_list(10, 0, test_data)
+
+nan_prediction = 295
+not_nan_prediction = 287
+
+#print(predicition_cosine_similarity(nan_prediction,0,test_data))
+#for n in range(0,30):
+#    print(has_rated(0,n,test_data.is_rated_matrix))
+
+
+#"""
+top_n_list = get_top_n_list(20, 0, test_data)
 for it in top_n_list:
     print("--------------------")
     print("movie_id:          "+str(it[0]))
@@ -69,11 +92,7 @@ for it in top_n_list:
 
 
 
-"""
 
 
 
-
-
-
-"""
+#"""
