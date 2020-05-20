@@ -62,3 +62,28 @@ class SelectionTest(unittest.TestCase):
         assert return_indices.shape == expected_indices.shape
         assert (return_indices == expected_indices).all()
 
+    def test_keep_elements_by_index(self):
+        #given
+        ratings_matrix = np.array([
+            [3, 1, 2],
+            [5, 2, 4],
+            [1, 2, 4]
+        ])
+
+        indices = np.array([
+            [0, 0], [0, 1],
+            [1, 1], [1, 2],
+            [2, 0]
+        ])
+
+        #when
+        filtered_matrix = selection.keep_elements_by_index(ratings_matrix, indices, 0)
+
+        #then
+        expected_matrix = np.array([
+            [3, 1, 0],
+            [0, 2, 4],
+            [1, 0, 0]
+        ])
+
+        assert (filtered_matrix == expected_matrix).all()
