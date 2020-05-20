@@ -4,7 +4,7 @@ import os
 from input import DATASET_DIR
 
 def read_ratings_matrix(path=os.path.join(DATASET_DIR, "R.csv"), delimiter=","):
-    return np.genfromtxt(path, delimiter=delimiter, dtype=np.uint8)
+    return np.genfromtxt(path, delimiter=delimiter, dtype=np.float)
 
 def read_is_rated_matrix(path=os.path.join(DATASET_DIR, "Y.csv"), delimiter=","):
     return np.genfromtxt(path, delimiter=delimiter, dtype=np.uint8).astype(bool)
