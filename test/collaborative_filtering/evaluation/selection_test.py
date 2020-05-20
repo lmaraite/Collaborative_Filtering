@@ -4,7 +4,7 @@ import numpy as np
 from numpy.random import default_rng
 import numpy.random
 
-from evaluation import selection
+from collaborative_filtering.evaluation import selection
 
 class SelectionTest(unittest.TestCase):
 

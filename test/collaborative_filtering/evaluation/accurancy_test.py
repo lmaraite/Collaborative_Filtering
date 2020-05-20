@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import math
 
-from evaluation import accurancy as ac
+from collaborative_filtering.evaluation import accurancy as ac
 
 class ErrorTest(unittest.TestCase):
 
