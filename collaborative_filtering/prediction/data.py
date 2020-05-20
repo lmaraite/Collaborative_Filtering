@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class dataset:
     def __init__(self, similarity_matrix: np.ndarray, rating_matrix: np.ndarray, is_rated_matrix: np.ndarray):
         self.similarity_matrix = similarity_matrix
