@@ -9,12 +9,14 @@ class EvaluationProperties(object):
             ratings_matrix: np.ndarray,
             is_rated_matrix: np.ndarray,
             similarity: str,
-            selection_strategy
+            selection_strategy,
+            train_size: float
         ):
         self.ratings_matrix = ratings_matrix
         self.is_rated_matrix = is_rated_matrix
         self.similarity = similarity
         self.selection_strategy = selection_strategy
+        self.train_size = train_size
 
 class EvaluationPropertiesBuilder(object):
 
@@ -23,6 +25,7 @@ class EvaluationPropertiesBuilder(object):
         self.is_rated_matrix = None
         self.similarity = None
         self.selection_strategy = None
+        self.train_size = 0.8
 
     def with_ratings_matrix(self, ratings_matrix):
         self.ratings_matrix = ratings_matrix
@@ -40,6 +43,14 @@ class EvaluationPropertiesBuilder(object):
         self.selection_strategy = selection_strategy
         return self
 
+    def with_train_size(self, train_size):
+        if train_size < 0:
+            raise ValueError("A negative train size is not allowed")
+        if train_size > 1:
+            raise ValueError("A train size greater 1 is not allowed")
+        self.train_size = train_size
+        return self
+
     def build(self):
         if not self._are_properties_complete():
             raise ValueError("Initialization not complete")
@@ -47,7 +58,8 @@ class EvaluationPropertiesBuilder(object):
             self.ratings_matrix,
             self.is_rated_matrix,
             self.similarity,
-            self.selection_strategy
+            self.selection_strategy,
+            self.train_size
         )
 
 

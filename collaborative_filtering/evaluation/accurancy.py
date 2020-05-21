@@ -11,13 +11,15 @@ class AccurancyEvaluationProperties(EvaluationProperties):
         is_rated_matrix: np.ndarray,
         similarity: str,
         selection_strategy,
+        train_size,
         error_measurement
     ):
         super().__init__(
             ratings_matrix,
             is_rated_matrix,
             similarity,
-            selection_strategy
+            selection_strategy,
+            train_size
         )
         self.error_measurement = error_measurement
 
@@ -40,6 +42,7 @@ class AccurancyEvaluationPropertiesBuilder(EvaluationPropertiesBuilder):
             self.is_rated_matrix,
             self.similarity,
             self.selection_strategy,
+            self.train_size,
             self.error_measurement
         )
 

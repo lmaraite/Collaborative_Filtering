@@ -40,6 +40,16 @@ class EvaluationPropertiesBuilderTest(unittest.TestCase):
                 .with_similarity("test") \
                 .build()
 
+    def test_builder_should_throw_error_for_negative_train_size(self):
+        with pytest.raises(ValueError):
+            EvaluationPropertiesBuilder() \
+                .with_train_size(-1)
+
+    def test_builder_should_throw_error_for_train_size_greater_one(self):
+        with pytest.raises(ValueError):
+            EvaluationPropertiesBuilder() \
+                .with_train_size(2)
+
     def test_build(self):
         #given
         ratings_matrix = np.array([
@@ -58,6 +68,7 @@ class EvaluationPropertiesBuilderTest(unittest.TestCase):
             .with_is_rated_matrix(is_rated) \
             .with_similarity("testSimilarity") \
             .with_selection_strategy(self.dummy_function) \
+            .with_train_size(0.5) \
             .build()
 
         #then
@@ -65,3 +76,4 @@ class EvaluationPropertiesBuilderTest(unittest.TestCase):
         assert (evaluation_properties.is_rated_matrix == is_rated).all()
         assert (evaluation_properties.similarity == "testSimilarity")
         assert (evaluation_properties.selection_strategy == self.dummy_function)
+        assert (evaluation_properties.train_size == 0.5)
