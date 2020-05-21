@@ -6,7 +6,7 @@ import similarity
 import prediction.data as data
 import prediction.prediction as prediction
 
-class AccurancyEvaluationProperties(EvaluationProperties):
+class SinglePredictionAccurancyEvaluationProperties(EvaluationProperties):
 
     def __init__(
         self,
@@ -28,7 +28,7 @@ class AccurancyEvaluationProperties(EvaluationProperties):
         self.error_measurement = error_measurement
         self.prediction_function = prediction
 
-class AccurancyEvaluationPropertiesBuilder(EvaluationPropertiesBuilder):
+class SinglePredictionAccurancyEvaluationPropertiesBuilder(EvaluationPropertiesBuilder):
 
     def __init__(self):
         super().__init__()
@@ -55,7 +55,7 @@ class AccurancyEvaluationPropertiesBuilder(EvaluationPropertiesBuilder):
         if not self._are_properties_complete():
             raise ValueError("Initialization not complete")
 
-        return AccurancyEvaluationProperties(
+        return SinglePredictionAccurancyEvaluationProperties(
             self.ratings_matrix,
             self.is_rated_matrix,
             self.similarity,
@@ -85,7 +85,7 @@ def root_mean_squared_error(predictions: np.array, ratings: np.array) -> float:
      )
 
 
-def run_accurancy_evaluation(eval_props: AccurancyEvaluationProperties):
+def run_accurancy_evaluation(eval_props: SinglePredictionAccurancyEvaluationProperties):
     train_indices, test_indices = eval_props.selection_strategy(
         eval_props.ratings_matrix.shape,
         eval_props.is_rated_matrix,
