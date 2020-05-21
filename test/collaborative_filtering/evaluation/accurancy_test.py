@@ -4,7 +4,8 @@ import math
 import pytest
 
 from evaluation import accurancy as ac
-from evaluation.accurancy import AccurancyEvaluationPropertiesBuilder
+from evaluation import selection
+from evaluation.accurancy import AccurancyEvaluationPropertiesBuilder, AccurancyEvaluationProperties
 from similarity import PEARSON, COSINE
 import prediction.prediction as prediction
 
@@ -102,3 +103,114 @@ class AccurancyEvaluationPropertiesBuilderTest(unittest.TestCase):
 
         assert builder.prediction_function == prediction.predicition_cosine_similarity
 
+
+class AccurancyEvaluationTest(unittest.TestCase):
+
+    #given
+    train_size = 5/6
+    ratings_matrix = np.array([
+        [3, 1, 4],
+        [4, 4, 3]
+    ])
+    is_rated_matrix = np.array([
+        [True, True, True],
+        [True, True, True]
+    ])
+
+    #returned values
+    selected_train_indices = np.array([(0, 0), (0, 1), (1, 0), (1, 1), (1, 2)])
+    selected_test_indices = np.array([(0, 2)])
+
+    filtered_is_rated = np.array([
+        [True, True, False],
+        [True, True, True]
+    ])
+
+    similarity_matrix = np.array([
+        [1, 0.8944271910],
+        [0.8944271910, 1]
+    ])
+
+    prediction_return = 3
+    error_return = 1
+
+    #callbacks with assertions
+    def callback_selection_strategy_mock(self, shape, is_rated, train_size):
+        assert shape == (2, 3)
+        assert (is_rated == self.is_rated_matrix).all()
+        assert train_size == self.train_size
+
+        return (self.selected_train_indices, self.selected_test_indices)
+
+    def callback_filter_mock(self, matrix, indices, baseValue):
+        assert (indices == self.selected_train_indices).all()
+        assert (matrix == self.is_rated_matrix).all()
+        assert baseValue == False
+
+        return self.filtered_is_rated
+
+    def callback_similarity_creation_mock(self, all_ratings, is_rated, mode):
+        assert (all_ratings == self.ratings_matrix).all()
+        assert (is_rated == self.filtered_is_rated).all()
+        assert mode == COSINE
+
+        return self.similarity_matrix
+
+    def callback_prediction_creation_mock(self, key_id, element_id, data):
+        assert key_id == 0
+        assert element_id == 2
+        assert (data.similarity_matrix == self.similarity_matrix).all()
+        assert (data.rating_matrix == self.ratings_matrix).all()
+        assert (data.is_rated_matrix == self.filtered_is_rated).all()
+
+        return self.prediction_return
+
+    def callback_error_measurement_mock(self, predictions, ratings):
+        assert (predictions == np.array([self.prediction_return])).all()
+        assert (ratings == np.array([self.ratings_matrix[0, 2]])).all()
+
+        return self.error_return
+
+    @pytest.fixture(autouse=True)
+    def setup(self, mocker):
+        self.selection_strategy_mock = mocker.patch(
+            "evaluation.selection.select_indices_with_hold_out"
+        )
+        self.selection_strategy_mock.side_effect = self.callback_selection_strategy_mock
+
+        self.filter_mock = mocker.patch(
+            "evaluation.selection.keep_elements_by_index"
+        )
+        self.filter_mock.side_effect = self.callback_filter_mock
+
+        self.similarity_creation_mock = mocker.patch(
+            "similarity.create_similarity_matrix"
+        )
+        self.similarity_creation_mock.side_effect = self.callback_similarity_creation_mock
+
+        self.prediction_creation_mock = mocker.patch(
+            "prediction.prediction.predicition_cosine_similarity",
+        )
+        self.prediction_creation_mock.side_effect = self.callback_prediction_creation_mock
+
+        self.error_measurement_mock = mocker.patch(
+            "evaluation.accurancy.root_mean_squared_error",
+        )
+        self.error_measurement_mock.side_effect = self.callback_error_measurement_mock
+
+    def test_run_accurancy_evaluation(self):
+        #given
+        eval_props = AccurancyEvaluationProperties(
+            self.ratings_matrix,
+            self.is_rated_matrix,
+            COSINE,
+            selection.select_indices_with_hold_out,
+            self.train_size,
+            ac.root_mean_squared_error,
+            prediction.predicition_cosine_similarity
+        )
+
+        #when
+        error = ac.run_accurancy_evaluation(eval_props)
+        #then
+        assert error == self.error_return

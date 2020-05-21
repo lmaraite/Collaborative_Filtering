@@ -1,8 +1,9 @@
 import numpy as np
 import math
 
-from evaluation import EvaluationProperties, EvaluationPropertiesBuilder
+from evaluation import EvaluationProperties, EvaluationPropertiesBuilder, selection
 import similarity
+import prediction.data as data
 import prediction.prediction as prediction
 
 class AccurancyEvaluationProperties(EvaluationProperties):
@@ -82,3 +83,45 @@ def root_mean_squared_error(predictions: np.array, ratings: np.array) -> float:
             )
         ) / len(predictions)
      )
+
+
+def run_accurancy_evaluation(eval_props: AccurancyEvaluationProperties):
+    train_indices, test_indices = eval_props.selection_strategy(
+        eval_props.ratings_matrix.shape,
+        eval_props.is_rated_matrix,
+        eval_props.train_size
+    )
+
+    kept_is_rated_matrix = selection.keep_elements_by_index(
+        eval_props.is_rated_matrix,
+        train_indices,
+        False
+    )
+
+    similarity_matrix = similarity.create_similarity_matrix(
+        eval_props.ratings_matrix,
+        kept_is_rated_matrix,
+        eval_props.similarity
+    )
+
+    dataset = data.dataset(
+        similarity_matrix,
+        eval_props.ratings_matrix,
+        kept_is_rated_matrix
+    )
+    predictions = np.empty(test_indices.shape[0])
+    actual_ratings = np.empty(test_indices.shape[0])
+
+    for i in range(test_indices.shape[0]):
+        test_index = test_indices[i]
+        predictions[i] = eval_props.prediction_function(
+            test_index[0],
+            test_index[1],
+            dataset
+        )
+        actual_ratings[i] = eval_props.ratings_matrix[test_index[0], test_index[1]]
+
+    return eval_props.error_measurement(
+        predictions,
+        actual_ratings
+    )
