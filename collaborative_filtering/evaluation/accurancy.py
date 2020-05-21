@@ -2,6 +2,8 @@ import numpy as np
 import math
 
 from evaluation import EvaluationProperties, EvaluationPropertiesBuilder
+import similarity
+import prediction.prediction as prediction
 
 class AccurancyEvaluationProperties(EvaluationProperties):
 
@@ -12,7 +14,8 @@ class AccurancyEvaluationProperties(EvaluationProperties):
         similarity: str,
         selection_strategy,
         train_size,
-        error_measurement
+        error_measurement,
+        prediction
     ):
         super().__init__(
             ratings_matrix,
@@ -22,15 +25,29 @@ class AccurancyEvaluationProperties(EvaluationProperties):
             train_size
         )
         self.error_measurement = error_measurement
+        self.prediction_function = prediction
 
 class AccurancyEvaluationPropertiesBuilder(EvaluationPropertiesBuilder):
 
     def __init__(self):
         super().__init__()
         self.error_measurement = None
+        self.prediction_function = None
 
     def with_error_measurement(self, error_measurement):
         self.error_measurement = error_measurement
+        return self
+
+    def with_similarity(self, similarity_mode):
+        super().with_similarity(similarity_mode)
+
+        if similarity_mode == similarity.PEARSON:
+            self.prediction_function = prediction.predicition_pearson_correlation
+        elif similarity_mode == similarity.COSINE:
+            self.prediction_function = prediction.predicition_cosine_similarity
+        elif similarity_mode == similarity.ADJUSTED_COSINE:
+            raise Error("Adjusted cosine is not yet implemented")
+
         return self
 
     def build(self):
@@ -43,7 +60,8 @@ class AccurancyEvaluationPropertiesBuilder(EvaluationPropertiesBuilder):
             self.similarity,
             self.selection_strategy,
             self.train_size,
-            self.error_measurement
+            self.error_measurement,
+            self.prediction_function
         )
 
     def _are_properties_complete(self):

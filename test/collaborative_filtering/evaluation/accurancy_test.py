@@ -5,6 +5,8 @@ import pytest
 
 from evaluation import accurancy as ac
 from evaluation.accurancy import AccurancyEvaluationPropertiesBuilder
+from similarity import PEARSON, COSINE
+import prediction.prediction as prediction
 
 class ErrorTest(unittest.TestCase):
 
@@ -73,7 +75,7 @@ class AccurancyEvaluationPropertiesBuilderTest(unittest.TestCase):
         evaluation_properties = AccurancyEvaluationPropertiesBuilder() \
             .with_ratings_matrix(ratings_matrix) \
             .with_is_rated_matrix(is_rated) \
-            .with_similarity("testSimilarity") \
+            .with_similarity(COSINE) \
             .with_selection_strategy(self.dummy_function) \
             .with_error_measurement(self.dummy_function) \
             .build()
@@ -81,6 +83,22 @@ class AccurancyEvaluationPropertiesBuilderTest(unittest.TestCase):
         #then
         assert (evaluation_properties.ratings_matrix == ratings_matrix).all()
         assert (evaluation_properties.is_rated_matrix == is_rated).all()
-        assert (evaluation_properties.similarity == "testSimilarity")
-        assert (evaluation_properties.selection_strategy == self.dummy_function)
-        assert (evaluation_properties.error_measurement == self.dummy_function)
+        assert evaluation_properties.similarity == COSINE
+        assert evaluation_properties.selection_strategy == self.dummy_function
+        assert evaluation_properties.error_measurement == self.dummy_function
+        assert evaluation_properties.prediction_function == prediction.predicition_cosine_similarity
+
+    def test_with_pearson_similarity(self):
+        #when
+        builder = AccurancyEvaluationPropertiesBuilder() \
+            .with_similarity(PEARSON)
+        #then
+        assert builder.prediction_function == prediction.predicition_pearson_correlation
+
+    def test_with_cosine_similarity(self):
+        #when
+        builder = AccurancyEvaluationPropertiesBuilder() \
+            .with_similarity(COSINE)
+
+        assert builder.prediction_function == prediction.predicition_cosine_similarity
+
