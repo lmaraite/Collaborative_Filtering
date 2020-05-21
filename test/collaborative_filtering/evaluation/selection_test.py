@@ -17,13 +17,13 @@ class SelectionTest(unittest.TestCase):
         shape = (4, 3)
         is_rated = np.array([True for x in range(12)]).reshape(shape)
         #when
-        return_indices = selection.select_indices_with_hold_out(
+        return_train_indices, return_test_indices = selection.select_indices_with_hold_out(
             shape,
             is_rated,
             train_size=0.5
         )
         #then
-        expected_indices = np.array([
+        expected_train_indices = np.array([
             [0, 0],
             [2, 1],
             [2, 0],
@@ -32,8 +32,18 @@ class SelectionTest(unittest.TestCase):
             [1, 0],
           ])
 
-        assert return_indices.shape == expected_indices.shape
-        assert (return_indices == expected_indices).all()
+        expected_test_indices = np.array([
+            [1, 2],
+            [0, 2],
+            [1, 1],
+            [3, 1],
+            [0, 1],
+            [2, 2]
+        ])
+
+        assert return_train_indices.shape == expected_train_indices.shape
+        assert (return_train_indices == expected_train_indices).all()
+        assert (return_test_indices == expected_test_indices).all()
 
     def test_hold_out_with_is_rated_matrix(self):
         #given
@@ -46,21 +56,28 @@ class SelectionTest(unittest.TestCase):
         ])
 
         #then
-        return_indices = selection.select_indices_with_hold_out(
+        return_train_indices, return_test_indices = selection.select_indices_with_hold_out(
             shape,
             is_rated,
             train_size=0.5
         )
         #then
-        expected_indices = np.array([
+        expected_train_indices = np.array([
             (1, 2),
             (1, 0),
             (3, 1),
             (2, 1)
         ])
 
-        assert return_indices.shape == expected_indices.shape
-        assert (return_indices == expected_indices).all()
+        expected_test_indices = np.array([
+            [0, 1],
+            [3, 0],
+            [0, 0]
+        ])
+
+        assert return_train_indices.shape == expected_train_indices.shape
+        assert (return_train_indices == expected_train_indices).all()
+        assert (return_test_indices == expected_test_indices).all()
 
     def test_keep_elements_by_index(self):
         #given

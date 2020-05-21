@@ -12,11 +12,11 @@ def select_indices_with_hold_out(shape, is_rated, train_size=0.8) -> np.array:
 
     size = indices.shape[0]
     max_number_elements = round(size * train_size)
-    return random_generator.permutation(indices)[:max_number_elements]
+    permutated_indices = random_generator.permutation(indices)
+    return (permutated_indices[:max_number_elements], permutated_indices[max_number_elements:])
 
 def keep_elements_by_index(matrix: np.ndarray, indices: np.array, baseValue: object) -> np.ndarray:
-    kept_matrix = np.empty_like(matrix)
-    kept_matrix[...] = baseValue
+    kept_matrix = np.full(matrix.shape, baseValue)
     for index_x, index_y in indices:
         kept_matrix[index_x, index_y] = matrix[index_x, index_y]
     return kept_matrix
