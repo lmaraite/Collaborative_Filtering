@@ -1,7 +1,7 @@
 import numpy as np
 import timeit
-from collaborative_filtering.similarity import create_similarity_matrix
-from collaborative_filtering.input.filesystem import read_ratings_matrix, read_is_rated_matrix
+from similarity import create_similarity_matrix
+from input.filesystem import read_ratings_matrix, read_is_rated_matrix
 
 # TODO: Implement additional functions to tidy up the code.
 # TODO: Use pydoc for documentation.
