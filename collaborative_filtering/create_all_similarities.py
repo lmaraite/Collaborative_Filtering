@@ -1,11 +1,10 @@
 import numpy as np
 import timeit
-from similarity import create_similarity_matrix, get_similarity
-from input.filesystem import read_ratings_matrix, read_is_rated_matrix
+from collaborative_filtering.similarity import create_similarity_matrix
+from collaborative_filtering.input.filesystem import read_ratings_matrix, read_is_rated_matrix
 
 # TODO: Implement additional functions to tidy up the code.
 # TODO: Use pydoc for documentation.
-# TODO: Save timings and console output to file.
 # TODO: Implement tests to ensure the correctness of the computed similarities.
 
 # Tracking the time for later evaluations.
