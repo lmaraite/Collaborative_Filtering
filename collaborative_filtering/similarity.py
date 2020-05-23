@@ -1,30 +1,23 @@
 import numpy as np
-import itertools
 from numpy.linalg import norm
-from progressbar import print_progressbar
 
 # TODO: Ignore RuntimeWarning caused by division by zero.
-# TODO: It's possible to save computation time for adjusted_cosine by computing and saving all element-means in advance.
-# TODO: All cases that produce a nan in get_similarity will still be computed twice.
-# TODO: Change from vertical to horizontal alignment of co_ratings. Affects multiple functions.
-# TODO: Progressbar is not working reliably since the new implementation of get_co_ratings.
-# TODO: Find faster solution for numpy iteration with two-dimensional indexing.
-# TODO: Should the results of compute_similarity be rounded?
+# TODO: It's possible to save computation time for adjusted_cosine by computing and saving all element-means globally.
+# TODO: Find a faster solution for numpy iteration with two-dimensional indexing.
 # TODO: Implement further functions to tidy up the code.
 # TODO: Use pydoc for documentation.
 
 '''
     Creates a similarity-matrix by iterating over all_ratings and saving every similarity at both
-    destinations at the same time to prevent a second computation of the same similarity. 
+    destinations at the same time to prevent a second computation of the same similarity.
+    The similarity of an element with itself is set to nan.
     Returns the whole matrix.
 '''
 def create_similarity_matrix(all_ratings, is_rated, mode):
     side_length = all_ratings.shape[0]
     similarity_matrix = np.full((side_length, side_length), np.nan)
-    print_progressbar(0, side_length, prefix=mode + " Progress: ", suffix="Complete", length=100)
-    for element1, element2 in itertools.product(range(side_length), range(side_length)):
-        print_progressbar(element1, side_length, prefix=mode + " Progress: ", suffix="Complete", length=100)
-        if np.isnan(similarity_matrix[element1, element2]):
+    for element1 in range(side_length):
+        for element2 in range(element1+1, side_length):
             similarity_matrix[element1, element2] = get_similarity((element1, element2), all_ratings, is_rated, mode)
             similarity_matrix[element2, element1] = similarity_matrix[element1, element2]
     return similarity_matrix
@@ -33,12 +26,12 @@ def create_similarity_matrix(all_ratings, is_rated, mode):
 '''
     Manages different steps to gather the co_ratings and preparing them for a final computation of the
     similarity. The adjustment according to the chosen mode will only take place if there are enough
-    co_ratings to prevent computations errors.
-    Returns the computed similarity or nan if there are less than two co_ratings.
+    co_ratings to prevent computation errors.
+    Returns the computed similarity or nan if there are too few co_ratings.
 '''
 def get_similarity(element_ids, all_ratings, is_rated, mode):
     co_ratings = get_co_ratings(element_ids, all_ratings, is_rated)
-    if less_than_two_co_ratings(co_ratings):
+    if less_than_x_co_ratings(co_ratings, 2):
         return np.nan
     else:
         adjusted_co_ratings = get_adjusted_co_ratings(element_ids, all_ratings, is_rated, co_ratings, mode)
@@ -53,7 +46,6 @@ def get_similarity(element_ids, all_ratings, is_rated, mode):
 # TODO: Find a way to index both rows at the same time to avoid vstack.
 def get_co_ratings(element_ids, all_ratings, is_rated):
     is_co_rated = get_is_co_rated(element_ids, is_rated)
-
     ratings_element1 = all_ratings[element_ids[0], :]
     ratings_element2 = all_ratings[element_ids[1], :]
     co_ratings = np.vstack((ratings_element1[is_co_rated], ratings_element2[is_co_rated]))
@@ -71,11 +63,11 @@ def get_is_co_rated(element_ids, is_rated):
 
 
 '''
-    Checks if there are less than two co_ratings which would trigger an unwanted behaviour in compute_similarity().
-    Returns TRUE if there are indeed less than two ratings.
+    Checks if there are too few co_ratings which would trigger an unwanted behaviour in compute_similarity().
+    Returns TRUE if there are indeed less than x co_ratings.
 '''
-def less_than_two_co_ratings(co_ratings):
-    return co_ratings.shape[0] < 2
+def less_than_x_co_ratings(co_ratings, x):
+    return co_ratings.shape[0] < x
 
 
 '''
@@ -128,8 +120,7 @@ def get_actual_element_ratings(element_id, all_ratings, is_rated):
 
 '''
     The final step to compute the similarity between two elements according to (Jannach et. al, 2011, p.19). 
-    Small internal rounding errors unveil when an element is compared to itself which will not return a
-    similarity of 1.0 . Will produce a RuntimeWarning if a division by zero is attempted.
+    Will produce a RuntimeWarning if a division by zero is attempted.
     Returns the resulting similarity.
 '''
 def compute_similarity(ratings):
