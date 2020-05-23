@@ -6,3 +6,60 @@ cwd = sys.path[0]
 cwd = os.path.abspath(cwd)
 collaborative_filtering_dir = os.path.join(cwd, "..")
 site.addsitedir(collaborative_filtering_dir)
+
+import numpy as np
+import threading
+
+from evaluation import accurancy as ac
+from evaluation import selection
+from input import filesystem
+import similarity
+
+ratings_matrix = filesystem.read_ratings_matrix() # movie x user matrix
+#is_rated_matrix = filesystem.read_is_rated_matrix()
+is_rated_matrix = (ratings_matrix != 0)
+
+class EvaluationThread(threading.Thread):
+    def __init__(self, evaluation_function, evaluation_props):
+        super().__init__()
+        self.result = None
+        self.evaluation_function = evaluation_function
+        self.evaluation_props = evaluation_props
+
+    def run(self):
+        self.result = self.evaluation_function(self.evaluation_props)
+
+def print_result(evaluation: EvaluationThread):
+    print(evaluation.evaluation_props)
+    print("Result: " + str(evaluation.result))
+
+#Pearson correlation and item-based
+pearson_item_based_prop = ac.SinglePredictionAccurancyEvaluationPropertiesBuilder() \
+    .with_ratings_matrix(ratings_matrix) \
+    .with_is_rated_matrix(is_rated_matrix) \
+    .with_similarity(similarity.PEARSON) \
+    .with_selection_strategy(selection.select_indices_with_hold_out) \
+    .with_train_size(0.8) \
+    .with_error_measurement(ac.root_mean_squared_error).build()
+
+pearson_item_based = EvaluationThread(ac.run_accurancy_evaluation, pearson_item_based_prop)
+
+#Raw cosine similarity and item-based
+cosine_item_based_prop = ac.SinglePredictionAccurancyEvaluationPropertiesBuilder() \
+    .with_ratings_matrix(ratings_matrix) \
+    .with_is_rated_matrix(is_rated_matrix) \
+    .with_similarity(similarity.COSINE) \
+    .with_selection_strategy(selection.select_indices_with_hold_out) \
+    .with_train_size(0.8) \
+    .with_error_measurement(ac.root_mean_squared_error).build()
+
+cosine_item_based = EvaluationThread(ac.run_accurancy_evaluation, cosine_item_based_prop)
+
+pearson_item_based.start()
+cosine_item_based.start()
+pearson_item_based.join()
+cosine_item_based.join()
+
+print_result(pearson_item_based)
+print("=========")
+print_result(cosine_item_based)
