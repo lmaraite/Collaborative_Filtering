@@ -20,3 +20,7 @@ def keep_elements_by_index(matrix: np.ndarray, indices: np.array, baseValue: obj
     for index_x, index_y in indices:
         kept_matrix[index_x, index_y] = matrix[index_x, index_y]
     return kept_matrix
+
+_names = {
+    select_indices_with_hold_out: "Hold Out"
+}

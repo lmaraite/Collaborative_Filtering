@@ -1,10 +1,13 @@
 import numpy as np
 import math
+import textwrap
 
 from evaluation import EvaluationProperties, EvaluationPropertiesBuilder, selection
 import similarity
 import prediction.data as data
 import prediction.prediction as prediction
+
+
 
 class SinglePredictionAccurancyEvaluationProperties(EvaluationProperties):
 
@@ -27,6 +30,12 @@ class SinglePredictionAccurancyEvaluationProperties(EvaluationProperties):
         )
         self.error_measurement = error_measurement
         self.prediction_function = prediction
+
+    def __str__(self):
+        return super().__str__() + \
+        textwrap.dedent("""\
+        error measurement: {}
+        """.format(_names[self.error_measurement]))
 
 class SinglePredictionAccurancyEvaluationPropertiesBuilder(EvaluationPropertiesBuilder):
 
@@ -125,3 +134,7 @@ def run_accurancy_evaluation(eval_props: SinglePredictionAccurancyEvaluationProp
         predictions,
         actual_ratings
     )
+
+_names = {
+    root_mean_squared_error: "Root Mean Squared Error"
+}

@@ -1,6 +1,9 @@
 import numpy as np
 import functools
-import similarity as similarity
+import textwrap
+
+import similarity
+from evaluation import selection
 
 class EvaluationProperties(object):
 
@@ -17,6 +20,13 @@ class EvaluationProperties(object):
         self.similarity = similarity
         self.selection_strategy = selection_strategy
         self.train_size = train_size
+
+    def __str__(self):
+        return textwrap.dedent("""\
+        similarity: {}
+        selection strategy: {}
+        train size: {}
+        """.format(self.similarity, selection._names[self.selection_strategy], self.train_size))
 
 class EvaluationPropertiesBuilder(object):
 
