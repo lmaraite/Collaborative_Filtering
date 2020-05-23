@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from data import dataset
-from neighborhood import get_nearest_neighbors, has_rated
+from prediction.data import dataset
+from prediction.neighborhood import get_nearest_neighbors, has_rated
 import numpy as np
 import math
 
