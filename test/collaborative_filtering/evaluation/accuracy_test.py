@@ -3,9 +3,9 @@ import numpy as np
 import math
 import pytest
 
-from evaluation import accurancy as ac
+from evaluation import accuracy as ac
 from evaluation import selection
-from evaluation.accurancy import SinglePredictionAccurancyEvaluationPropertiesBuilder, SinglePredictionAccurancyEvaluationProperties
+from evaluation.accuracy import SinglePredictionAccuracyEvaluationPropertiesBuilder, SinglePredictionAccuracyEvaluationProperties
 from similarity import PEARSON, COSINE
 import prediction.prediction as prediction
 
@@ -47,13 +47,13 @@ class RootMeanSquaredErrorTest(unittest.TestCase):
         #then
         assert math.isclose(error, expected_error)
 
-class SinglePredictionAccurancyEvaluationPropertiesBuilderTest(unittest.TestCase):
+class SinglePredictionAccuracyEvaluationPropertiesBuilderTest(unittest.TestCase):
 
     dummy_function = lambda x, y, z: x
 
     def test_builder_should_throw_error_without_error_measurement(self):
         with pytest.raises(ValueError):
-            SinglePredictionAccurancyEvaluationPropertiesBuilder() \
+            SinglePredictionAccuracyEvaluationPropertiesBuilder() \
                 .with_is_rated_matrix(np.array([])) \
                 .with_ratings_matrix(np.array([])) \
                 .with_similarity("test") \
@@ -73,7 +73,7 @@ class SinglePredictionAccurancyEvaluationPropertiesBuilderTest(unittest.TestCase
             [False, True, False]
         ])
         #when
-        evaluation_properties = SinglePredictionAccurancyEvaluationPropertiesBuilder() \
+        evaluation_properties = SinglePredictionAccuracyEvaluationPropertiesBuilder() \
             .with_ratings_matrix(ratings_matrix) \
             .with_is_rated_matrix(is_rated) \
             .with_similarity(COSINE) \
@@ -91,20 +91,20 @@ class SinglePredictionAccurancyEvaluationPropertiesBuilderTest(unittest.TestCase
 
     def test_with_pearson_similarity(self):
         #when
-        builder = SinglePredictionAccurancyEvaluationPropertiesBuilder() \
+        builder = SinglePredictionAccuracyEvaluationPropertiesBuilder() \
             .with_similarity(PEARSON)
         #then
         assert builder.prediction_function == prediction.predicition_pearson_correlation
 
     def test_with_cosine_similarity(self):
         #when
-        builder = SinglePredictionAccurancyEvaluationPropertiesBuilder() \
+        builder = SinglePredictionAccuracyEvaluationPropertiesBuilder() \
             .with_similarity(COSINE)
 
         assert builder.prediction_function == prediction.predicition_cosine_similarity
 
 
-class AccurancyEvaluationTest(unittest.TestCase):
+class AccuracyEvaluationTest(unittest.TestCase):
 
     #given
     train_size = 5/6
@@ -194,13 +194,13 @@ class AccurancyEvaluationTest(unittest.TestCase):
         self.prediction_creation_mock.side_effect = self.callback_prediction_creation_mock
 
         self.error_measurement_mock = mocker.patch(
-            "evaluation.accurancy.root_mean_squared_error",
+            "evaluation.accuracy.root_mean_squared_error",
         )
         self.error_measurement_mock.side_effect = self.callback_error_measurement_mock
 
-    def test_run_accurancy_evaluation(self):
+    def test_run_accuracy_evaluation(self):
         #given
-        eval_props = SinglePredictionAccurancyEvaluationProperties(
+        eval_props = SinglePredictionAccuracyEvaluationProperties(
             self.ratings_matrix,
             self.is_rated_matrix,
             COSINE,
@@ -211,6 +211,6 @@ class AccurancyEvaluationTest(unittest.TestCase):
         )
 
         #when
-        error = ac.run_accurancy_evaluation(eval_props)
+        error = ac.run_accuracy_evaluation(eval_props)
         #then
         assert error == self.error_return

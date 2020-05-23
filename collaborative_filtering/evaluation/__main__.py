@@ -10,7 +10,7 @@ site.addsitedir(collaborative_filtering_dir)
 import numpy as np
 import threading
 
-from evaluation import accurancy as ac
+from evaluation import accuracy as ac
 from evaluation import selection
 from input import filesystem
 import similarity
@@ -33,7 +33,7 @@ def print_result(evaluation: EvaluationThread):
     print("Result: " + str(evaluation.result))
 
 #Pearson correlation and item-based
-pearson_item_based_prop = ac.SinglePredictionAccurancyEvaluationPropertiesBuilder() \
+pearson_item_based_prop = ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
     .with_ratings_matrix(ratings_matrix) \
     .with_is_rated_matrix(is_rated_matrix) \
     .with_similarity(similarity.PEARSON) \
@@ -41,10 +41,10 @@ pearson_item_based_prop = ac.SinglePredictionAccurancyEvaluationPropertiesBuilde
     .with_train_size(0.8) \
     .with_error_measurement(ac.root_mean_squared_error).build()
 
-pearson_item_based = EvaluationThread(ac.run_accurancy_evaluation, pearson_item_based_prop)
+pearson_item_based = EvaluationThread(ac.run_accuracy_evaluation, pearson_item_based_prop)
 
 #Raw cosine similarity and item-based
-cosine_item_based_prop = ac.SinglePredictionAccurancyEvaluationPropertiesBuilder() \
+cosine_item_based_prop = ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
     .with_ratings_matrix(ratings_matrix) \
     .with_is_rated_matrix(is_rated_matrix) \
     .with_similarity(similarity.COSINE) \
@@ -52,7 +52,7 @@ cosine_item_based_prop = ac.SinglePredictionAccurancyEvaluationPropertiesBuilder
     .with_train_size(0.8) \
     .with_error_measurement(ac.root_mean_squared_error).build()
 
-cosine_item_based = EvaluationThread(ac.run_accurancy_evaluation, cosine_item_based_prop)
+cosine_item_based = EvaluationThread(ac.run_accuracy_evaluation, cosine_item_based_prop)
 
 pearson_item_based.start()
 cosine_item_based.start()
