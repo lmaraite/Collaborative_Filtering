@@ -16,8 +16,7 @@ from input import filesystem
 import similarity
 
 ratings_matrix = filesystem.read_ratings_matrix() # movie x user matrix
-#is_rated_matrix = filesystem.read_is_rated_matrix()
-is_rated_matrix = (ratings_matrix != 0)
+is_rated_matrix = filesystem.read_is_rated_matrix()
 
 class EvaluationThread(threading.Thread):
     def __init__(self, evaluation_function, evaluation_props):
