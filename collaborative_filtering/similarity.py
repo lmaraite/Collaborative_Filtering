@@ -1,11 +1,12 @@
 import numpy as np
+import warnings
 from numpy.linalg import norm
 
-# TODO: Ignore RuntimeWarning caused by division by zero.
 # TODO: It's possible to save computation time for adjusted_cosine by computing and saving all element-means globally.
 # TODO: Find a faster solution for numpy iteration with two-dimensional indexing.
 # TODO: Implement further functions to tidy up the code.
 # TODO: Use pydoc for documentation.
+
 
 '''
     Creates a similarity-matrix by iterating over all_ratings and saving every similarity at both
@@ -120,8 +121,12 @@ def get_actual_element_ratings(element_id, all_ratings, is_rated):
 
 '''
     The final step to compute the similarity between two elements according to (Jannach et. al, 2011, p.19). 
-    Will produce a RuntimeWarning if a division by zero is attempted.
+    Would produce a RuntimeWarning when a division by zero is attempted. This is ignored because in these cases
+    nan will be returned which is expected behavior.
     Returns the resulting similarity.
 '''
 def compute_similarity(ratings):
-    return np.dot(ratings[:, 0], ratings[:, 1]) / (norm(ratings[:, 0]) * norm(ratings[:, 1]))
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        similarity = np.dot(ratings[:, 0], ratings[:, 1]) / (norm(ratings[:, 0]) * norm(ratings[:, 1]))
+    return similarity
