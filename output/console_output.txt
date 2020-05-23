@@ -1,10 +1,8 @@
-The program has taken 2.150655377001385 seconds to load the data.
-The program has taken 30.213299756000197 seconds to create and save the item-based cosine-matrix.
-/home/dennis/PycharmProjects/Collaborative_Filtering/collaborative_filtering/similarity.py:127: RuntimeWarning: invalid value encountered in double_scalars
-  return np.dot(ratings[:, 0], ratings[:, 1]) / (norm(ratings[:, 0]) * norm(ratings[:, 1]))
-The program has taken 57.0473207670002 seconds to create and save the item-based adjusted_cosine-matrix.
-The program has taken 51.81409989700114 seconds to create and save the item-based pearson-matrix.
-The program has taken 17.933774440996785 seconds to create and save the user-based cosine-matrix.
-The program has taken 40.08738460099994 seconds to create and save the user-based adjusted_cosine-matrix.
-The program has taken 30.631597470997804 seconds to create and save the user-based pearson-matrix.
-The program has taken 229.87851155799945 seconds to execute completely.
+The program has taken 1.7766508180029632 seconds to load the data.
+The program has taken 29.56242475399995 seconds to create and save the item-based cosine-matrix.
+The program has taken 54.246461167000234 seconds to create and save the item-based adjusted_cosine-matrix.
+The program has taken 49.70263237600011 seconds to create and save the item-based pearson-matrix.
+The program has taken 17.74610263499926 seconds to create and save the user-based cosine-matrix.
+The program has taken 36.701817608001875 seconds to create and save the user-based adjusted_cosine-matrix.
+The program has taken 29.439907930998743 seconds to create and save the user-based pearson-matrix.
+The program has taken 219.17631806999998 seconds to execute completely.
