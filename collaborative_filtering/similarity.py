@@ -2,11 +2,13 @@ import numpy as np
 import warnings
 from numpy.linalg import norm
 
-# TODO: It's possible to save computation time for adjusted_cosine by computing and saving all element-means globally.
+# TODO: Clean up and improve the implementation of matrix_mode in adjusted_cosine.
 # TODO: Find a faster solution for numpy iteration with two-dimensional indexing.
 # TODO: Implement further functions to tidy up the code.
 # TODO: Use pydoc for documentation.
 
+# Used in case of adjusted_cosine.
+all_mean_values = np.array(0)
 
 '''
     Creates a similarity-matrix by iterating over all_ratings and saving every similarity at both
@@ -16,10 +18,13 @@ from numpy.linalg import norm
 '''
 def create_similarity_matrix(all_ratings, is_rated, mode):
     side_length = all_ratings.shape[0]
+    if mode == "adjusted_cosine":
+        global all_mean_values
+        all_mean_values = np.full(side_length, np.nan)
     similarity_matrix = np.full((side_length, side_length), np.nan)
     for element1 in range(side_length):
         for element2 in range(element1+1, side_length):
-            similarity_matrix[element1, element2] = get_similarity((element1, element2), all_ratings, is_rated, mode)
+            similarity_matrix[element1, element2] = get_similarity((element1, element2), all_ratings, is_rated, mode, matrix_mode=True)
             similarity_matrix[element2, element1] = similarity_matrix[element1, element2]
     return similarity_matrix
 
@@ -30,12 +35,12 @@ def create_similarity_matrix(all_ratings, is_rated, mode):
     co_ratings to prevent computation errors.
     Returns the computed similarity or nan if there are too few co_ratings.
 '''
-def get_similarity(element_ids, all_ratings, is_rated, mode):
+def get_similarity(element_ids, all_ratings, is_rated, mode, matrix_mode):
     co_ratings = get_co_ratings(element_ids, all_ratings, is_rated)
     if less_than_x_co_ratings(co_ratings, 2):
         return np.nan
     else:
-        adjusted_co_ratings = get_adjusted_co_ratings(element_ids, all_ratings, is_rated, co_ratings, mode)
+        adjusted_co_ratings = get_adjusted_co_ratings(element_ids, all_ratings, is_rated, co_ratings, mode, matrix_mode)
         return compute_similarity(adjusted_co_ratings)
 
 
@@ -76,9 +81,9 @@ def less_than_x_co_ratings(co_ratings, x):
     cosine. Defaults to cosine if the mode is unknown. 
     Returns the algorithm-adjusted co_ratings.
 '''
-def get_adjusted_co_ratings(element_ids, all_ratings, is_rated, co_ratings, mode):
+def get_adjusted_co_ratings(element_ids, all_ratings, is_rated, co_ratings, mode, matrix_mode):
     if mode == "adjusted_cosine":
-        return convert_to_adjusted_cosine(element_ids, all_ratings, is_rated, co_ratings)
+        return convert_to_adjusted_cosine(element_ids, all_ratings, is_rated, co_ratings, matrix_mode)
     elif mode == "pearson":
         return convert_to_pearson(co_ratings)
     elif mode == "cosine":
@@ -100,14 +105,22 @@ def convert_to_pearson(co_ratings):
     Adjusts the co_ratings to adjusted_cosine by subtracting the means of all ratings 
     given to the specific elements. Extra steps are needed to filter only the element-specific 
     ratings from all_ratings considering that some may be redundant.
+    If the whole matrix is to be computed a matrix_mode is triggered which improves the speed
+    by storing the means of all elements in the global array element_mean_values.
     Returns the adjusted co_ratings.
 '''
-def convert_to_adjusted_cosine(element_ids, all_ratings, is_rated, co_ratings):
-    actual_ratings_element1 = get_actual_element_ratings(element_ids[0], all_ratings, is_rated)
-    actual_ratings_element2 = get_actual_element_ratings(element_ids[1], all_ratings, is_rated)
-
-    # Subtracts the means of all element-specific ratings column-wise.
-    return co_ratings - np.array([np.mean(actual_ratings_element1), np.mean(actual_ratings_element2)])
+def convert_to_adjusted_cosine(element_ids, all_ratings, is_rated, co_ratings, matrix_mode):
+    if matrix_mode:
+        global all_mean_values
+        for element in element_ids:
+            if np.isnan(all_mean_values[element]):
+                actual_element_ratings = get_actual_element_ratings(element, all_ratings, is_rated)
+                all_mean_values[element] = np.mean(actual_element_ratings)
+        return co_ratings - np.hstack([all_mean_values[element_ids[0]], all_mean_values[element_ids[1]]])
+    else:
+        actual_ratings_element1 = get_actual_element_ratings(element_ids[0], all_ratings, is_rated)
+        actual_ratings_element2 = get_actual_element_ratings(element_ids[1], all_ratings, is_rated)
+        return co_ratings - np.array([np.mean(actual_ratings_element1), np.mean(actual_ratings_element2)])
 
 
 '''
