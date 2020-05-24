@@ -1,5 +1,7 @@
 import itertools
 
+# TODO: Does not yet work if value is nan. Needs np.isnan() in these cases.
+
 '''
     Tests all elements of a matrix for a certain value. 
     If activated the positions of the value will be printed on screen.
