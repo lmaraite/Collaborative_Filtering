@@ -43,15 +43,23 @@ def add_pearson_average(key_id: int, nearest_neighbors: list, data: dataset):
         it.pearson_average = np.average(intersected_rating_vector)
 
 
-def predicition_pearson_correlation(key_id: int, element_id: int, data: dataset) -> float:
+def predicition_pearson_correlation(key_id: int, element_id: int, data: dataset) -> tuple:
+    """
+    :param key_id:
+    :param element_id:
+    :param data:
+    :return: A tuple of the pearson correlation coefficient (0) and the count of nearest neighbors which was used to
+    predict this rating (1)
+    """
     nearest_neighbors = get_nearest_neighbors(MAX_NEAREST_NEIGHBORS, key_id, element_id, data)
     add_pearson_average(key_id, nearest_neighbors, data)
-    counter = 0
-    denominator = 0
+    counter, denominator = 0, 0
     for it in nearest_neighbors:
         counter += it.similarity * (it.rating - it.pearson_average)
         denominator += it.similarity
-    return counter / denominator
+    if denominator == 0:
+        return 0, 0
+    return counter / denominator, len(nearest_neighbors)
 
 
 def get_top_n_list(n: int, user_id, data: dataset) -> list:
