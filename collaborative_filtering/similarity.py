@@ -7,6 +7,10 @@ from numpy.linalg import norm
 # TODO: Implement further functions to tidy up the code.
 # TODO: Use pydoc for documentation.
 
+PEARSON = "pearson"
+ADJUSTED_COSINE = "adjusted_cosine"
+COSINE = "cosine"
+
 '''
     Creates a similarity-matrix by iterating over all_ratings and saving every similarity at both
     destinations at the same time to prevent a second computation of the same similarity.
@@ -76,11 +80,11 @@ def less_than_x_co_ratings(co_ratings, x):
     Returns the algorithm-adjusted co_ratings.
 '''
 def get_adjusted_co_ratings(element_ids, all_ratings, is_rated, co_ratings, mode):
-    if mode == "adjusted_cosine":
+    if mode == ADJUSTED_COSINE:
         return convert_to_adjusted_cosine(element_ids, all_ratings, is_rated, co_ratings)
-    elif mode == "pearson":
+    elif mode == PEARSON:
         return convert_to_pearson(co_ratings)
-    elif mode == "cosine":
+    elif mode == COSINE:
         return co_ratings
     else:
         print("Unknown mode selected. The algorithm defaults to cosine similarity.")

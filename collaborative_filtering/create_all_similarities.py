@@ -1,5 +1,8 @@
 import numpy as np
 import timeit
+import similarity
+from similarity import create_similarity_matrix, get_similarity
+import similarity
 from similarity import create_similarity_matrix
 from input.filesystem import read_ratings_matrix, read_is_rated_matrix
 
@@ -17,7 +20,7 @@ is_rated = read_is_rated_matrix()
 global_elapsed_time = timeit.default_timer() - global_start_time
 print("The program has taken " + str(global_elapsed_time) + " seconds to load the data.")
 
-algorithms = ["cosine", "adjusted_cosine", "pearson"]
+algorithms = [similarity.COSINE, similarity.ADJUSTED_COSINE, similarity.PEARSON]
 
 # Computing item-based similarity-matrices and saving them.
 for algorithm in algorithms:
