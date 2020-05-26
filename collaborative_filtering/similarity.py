@@ -2,25 +2,24 @@ import numpy as np
 import warnings
 from numpy.linalg import norm
 
-# TODO: Implement option for user-based.
-# TODO: Correct all issues with adjusted cosine und pearson.
-# TODO: Make pearson great again (runs too slow now).
-# TODO: Fix comments (check all comments).
-# TODO: Clean up and improve the implementation of matrix_mode in adjusted_cosine.
+
+# TODO: Correct all issues with adjusted cosine.
 # TODO: Find a faster solution for numpy iteration with two-dimensional indexing.
 # TODO: Implement further functions to tidy up the code.
 # TODO: Use pydoc for documentation.
 
+
 '''
     Creates a similarity-matrix by iterating over all_ratings and saving every similarity at both
     destinations at the same time to prevent a second computation of the same similarity.
-    To run "adjusted_cosine" efficiently the order of operations has to be changed. 
-    It is a hacky solution but it will stay like this for the time being.
+    To run "adjusted_cosine" efficiently the order of operations is changed. 
+    It is not a clean solution but it will stay like this for the time being.
     Returns the whole matrix.
 '''
 def create_similarity_matrix(all_ratings, is_rated, mode):
     if mode == "adjusted_cosine":
         all_ratings = get_adjusted_cosine_ratings(all_ratings, is_rated)
+
     side_length = all_ratings.shape[0]
     similarity_matrix = np.full((side_length, side_length), np.nan)
     for element1 in range(side_length):
@@ -111,15 +110,12 @@ def less_than_x_co_ratings(co_ratings, x):
 
 
 '''
-    Adjusts the co_ratings to pearson by subtracting the means of the element-specific co_ratings.
+    Adjusts the co_ratings to pearson by subtracting the means of the element-specific co_ratings according
+    to (Gross,  2016, p.7-9)
     Returns the adjusted co_ratings.
 '''
-# TODO: This function seems to have some issues. Needs more work.
 def get_pearson_adjusted_co_ratings(co_ratings):
-    pearson_adjusted_co_ratings = np.empty(co_ratings.shape)
-    for row, index in zip(co_ratings, range(co_ratings.shape[0])):
-        pearson_adjusted_co_ratings[index] = row - np.mean(row)
-    return pearson_adjusted_co_ratings
+    return co_ratings - np.array([np.mean(co_ratings[:, 0]), np.mean(co_ratings[:, 1])])
 
 
 '''

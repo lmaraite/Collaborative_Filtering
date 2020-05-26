@@ -1,6 +1,8 @@
-The program has taken 1.886456709000413 seconds to load the data.
-The program has taken 29.39636290099952 seconds to create and save the item-based cosine-matrix.
-The program has taken 29.576617741999144 seconds to create and save the item-based adjusted_cosine-matrix.
-The program has taken 177.53124132399898 seconds to create and save the item-based pearson-matrix.
-
-Process finished with exit code 0
+The program has taken 1.7643010020037764 seconds to load the data.
+The program has taken 28.8040464730002 seconds to create and save the item-based cosine-matrix.
+The program has taken 29.07169834999513 seconds to create and save the item-based adjusted_cosine-matrix.
+The program has taken 49.721770741998625 seconds to create and save the item-based pearson-matrix.
+The program has taken 17.543625596998027 seconds to create and save the user-based cosine-matrix.
+The program has taken 17.60790251999424 seconds to create and save the user-based adjusted_cosine-matrix.
+The program has taken 29.382148826996854 seconds to create and save the user-based pearson-matrix.
+The program has taken 173.8958170190017 seconds to execute completely.

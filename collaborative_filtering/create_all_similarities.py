@@ -3,9 +3,10 @@ import timeit
 from similarity import create_similarity_matrix
 from input.filesystem import read_ratings_matrix, read_is_rated_matrix
 
+
 # TODO: Implement additional functions to tidy up the code.
 # TODO: Use pydoc for documentation.
-# TODO: Implement tests to ensure the correctness of the computed similarities.
+
 
 # Tracking the time for later evaluations.
 global_start_time = timeit.default_timer()
@@ -29,10 +30,9 @@ for algorithm in algorithms:
     local_elapsed_time = timeit.default_timer() - local_start_time
     print("The program has taken " + str(local_elapsed_time) + " seconds to create and save the item-based " + algorithm + "-matrix.")
 
-'''
 # Transposing item_based_ratings and is_rated to allow for user-based computations.
-user_based_ratings = item_based_ratings.T
-has_rated = is_rated.T
+user_based_ratings = item_based_ratings.transpose()
+has_rated = is_rated.transpose()
 
 # Computing user-based similarity-matrices and saving them.
 for algorithm in algorithms:
@@ -46,10 +46,10 @@ for algorithm in algorithms:
 
 global_elapsed_time = timeit.default_timer() - global_start_time
 print("The program has taken " + str(global_elapsed_time) + " seconds to execute completely.")
-'''
 
-# TODO: Find a way to use get_similarity in case of adjusted_cosine for single similarities.
+
 # For testing purposes only. Will print single similarities between elements.
+# TODO: Find a way to use get_similarity in case of adjusted_cosine for single similarities.
 '''
 element_ids = (0, 1)
 
