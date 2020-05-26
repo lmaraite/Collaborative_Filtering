@@ -29,6 +29,7 @@ for algorithm in algorithms:
     local_elapsed_time = timeit.default_timer() - local_start_time
     print("The program has taken " + str(local_elapsed_time) + " seconds to create and save the item-based " + algorithm + "-matrix.")
 
+'''
 # Transposing item_based_ratings and is_rated to allow for user-based computations.
 user_based_ratings = item_based_ratings.T
 has_rated = is_rated.T
@@ -45,7 +46,7 @@ for algorithm in algorithms:
 
 global_elapsed_time = timeit.default_timer() - global_start_time
 print("The program has taken " + str(global_elapsed_time) + " seconds to execute completely.")
-
+'''
 
 # For testing purposes only. Will print single similarities between elements.
 '''
