@@ -3,7 +3,8 @@ import warnings
 from numpy.linalg import norm
 
 # TODO: Implement option for user-based.
-# TODO: Correct all issues with adjusted cosine und Pearson
+# TODO: Correct all issues with adjusted cosine und pearson.
+# TODO: Make pearson great again (runs too slow now).
 # TODO: Fix comments (check all comments).
 # TODO: Clean up and improve the implementation of matrix_mode in adjusted_cosine.
 # TODO: Find a faster solution for numpy iteration with two-dimensional indexing.
