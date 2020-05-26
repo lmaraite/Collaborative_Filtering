@@ -1,0 +1,5 @@
+numpy
+
+#dependencies for testing
+pytest
+pytest-mock
