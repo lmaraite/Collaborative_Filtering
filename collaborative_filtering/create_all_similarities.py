@@ -48,6 +48,7 @@ global_elapsed_time = timeit.default_timer() - global_start_time
 print("The program has taken " + str(global_elapsed_time) + " seconds to execute completely.")
 '''
 
+# TODO: Find a way to use get_similarity in case of adjusted_cosine for single similarities.
 # For testing purposes only. Will print single similarities between elements.
 '''
 element_ids = (0, 1)

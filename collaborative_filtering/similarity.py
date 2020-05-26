@@ -2,6 +2,9 @@ import numpy as np
 import warnings
 from numpy.linalg import norm
 
+# TODO: Implement option for user-based.
+# TODO: Correct all issues with adjusted cosine und Pearson
+# TODO: Fix comments (check all comments).
 # TODO: Clean up and improve the implementation of matrix_mode in adjusted_cosine.
 # TODO: Find a faster solution for numpy iteration with two-dimensional indexing.
 # TODO: Implement further functions to tidy up the code.
@@ -10,7 +13,8 @@ from numpy.linalg import norm
 '''
     Creates a similarity-matrix by iterating over all_ratings and saving every similarity at both
     destinations at the same time to prevent a second computation of the same similarity.
-    The similarity of an element with itself is set to nan.
+    To run "adjusted_cosine" efficiently the order of operations has to be changed. 
+    It is a hacky solution but it will stay like this for the time being.
     Returns the whole matrix.
 '''
 def create_similarity_matrix(all_ratings, is_rated, mode):
@@ -24,10 +28,19 @@ def create_similarity_matrix(all_ratings, is_rated, mode):
             similarity_matrix[element2, element1] = similarity_matrix[element1, element2]
     return similarity_matrix
 
+
+'''
+    To avoid the repeated computation of the same means all_ratings gets adjusted to "adjusted_cosine" in advance.
+    Returns an adjusted version of all_ratings in which all user means have already been subtracted.
+'''
 def get_adjusted_cosine_ratings(all_ratings, is_rated):
     all_user_means = get_all_user_means(all_ratings, is_rated)
     return all_ratings - all_user_means.transpose()
 
+
+'''
+    Returns an array with all user means.
+'''
 def get_all_user_means(all_ratings, is_rated):
     number_of_users = all_ratings.shape[1]
     all_user_means = np.empty(number_of_users)
@@ -39,7 +52,7 @@ def get_all_user_means(all_ratings, is_rated):
 
 '''
     Filters all 'ratings' which are actually redundant.
-    Returns an array with only the element's real ratings.
+    Returns an array with only the user's real ratings.
 '''
 def get_actual_user_ratings(user, all_ratings, is_rated):
     user_ratings = all_ratings[:, user]
@@ -48,8 +61,9 @@ def get_actual_user_ratings(user, all_ratings, is_rated):
 
 '''
     Manages different steps to gather the co_ratings and preparing them for a final computation of the
-    similarity. The adjustment according to the chosen mode will only take place if there are enough
-    co_ratings to prevent computation errors.
+    similarity. If the mode is "pearson" the co_ratings need further adjustment. "cosine" needs no adjustment
+    at all and in case of "adjusted_cosine" the ratings will already be adjusted beforehand.
+    The adjustment and/or computation will only take place if there are enough co_ratings to prevent computation errors.
     Returns the computed similarity or nan if there are too few co_ratings.
 '''
 def get_similarity(element_ids, all_ratings, is_rated, mode):
@@ -99,6 +113,7 @@ def less_than_x_co_ratings(co_ratings, x):
     Adjusts the co_ratings to pearson by subtracting the means of the element-specific co_ratings.
     Returns the adjusted co_ratings.
 '''
+# TODO: This function seems to have some issues. Needs more work.
 def get_pearson_adjusted_co_ratings(co_ratings):
     pearson_adjusted_co_ratings = np.empty(co_ratings.shape)
     for row, index in zip(co_ratings, range(co_ratings.shape[0])):
