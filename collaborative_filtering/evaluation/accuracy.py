@@ -123,7 +123,7 @@ def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProper
 
     for i in range(test_indices.shape[0]):
         test_index = test_indices[i]
-        predictions[i] = eval_props.prediction_function(
+        predictions[i], _ = eval_props.prediction_function(
             test_index[0],
             test_index[1],
             dataset

@@ -131,7 +131,7 @@ class AccuracyEvaluationTest(unittest.TestCase):
         [0.8944271910, 1]
     ])
 
-    prediction_return = 3
+    prediction_return = 3, 1
     error_return = 1
 
     #callbacks with assertions
