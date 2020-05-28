@@ -9,6 +9,10 @@ from evaluation.accuracy import SinglePredictionAccuracyEvaluationPropertiesBuil
 from similarity import PEARSON, COSINE
 import prediction.prediction as prediction
 
+def assert_are_same_matrices(first_matrix, second_matrix):
+    assert first_matrix.shape == second_matrix.shape
+    assert (first_matrix == second_matrix).all()
+
 class ErrorTest(unittest.TestCase):
 
     def test_error_of_prediction_for_4_and_3(self):
@@ -137,21 +141,20 @@ class AccuracyEvaluationTest(unittest.TestCase):
     #callbacks with assertions
     def callback_selection_strategy_mock(self, shape, is_rated, train_size):
         assert shape == (2, 3)
-        assert (is_rated == self.is_rated_matrix).all()
+        assert_are_same_matrices(is_rated, self.is_rated_matrix)
         assert train_size == self.train_size
 
         yield (self.selected_train_indices, self.selected_test_indices)
 
     def callback_filter_mock(self, matrix, indices, baseValue):
-        assert (indices == self.selected_train_indices).all()
-        assert (matrix == self.is_rated_matrix).all()
+        assert_are_same_matrices(indices, self.selected_train_indices)
+        assert_are_same_matrices(matrix, self.is_rated_matrix)
         assert baseValue == False
 
         return self.filtered_is_rated
 
     def callback_similarity_creation_mock(self, all_ratings, is_rated, mode):
-        assert (all_ratings == self.ratings_matrix).all()
-        assert (is_rated == self.filtered_is_rated).all()
+        assert_are_same_matrices(all_ratings, self.ratings_matrix)
         assert mode == COSINE
 
         return self.similarity_matrix
@@ -159,15 +162,15 @@ class AccuracyEvaluationTest(unittest.TestCase):
     def callback_prediction_creation_mock(self, key_id, element_id, data):
         assert key_id == 0
         assert element_id == 2
-        assert (data.similarity_matrix == self.similarity_matrix).all()
-        assert (data.rating_matrix == self.ratings_matrix).all()
-        assert (data.is_rated_matrix == self.filtered_is_rated).all()
+        assert_are_same_matrices(data.similarity_matrix, self.similarity_matrix)
+        assert_are_same_matrices(data.rating_matrix, self.ratings_matrix)
+        assert_are_same_matrices(data.is_rated_matrix, self.filtered_is_rated)
 
         return self.prediction_return
 
     def callback_error_measurement_mock(self, predictions, ratings):
-        assert (predictions == np.array([self.prediction_return])).all()
-        assert (ratings == np.array([self.ratings_matrix[0, 2]])).all()
+        assert_are_same_matrices(predictions, np.array([self.prediction_return[0]]))
+        assert_are_same_matrices(ratings, np.array([self.ratings_matrix[0, 2]]))
 
         return self.error_return
 
