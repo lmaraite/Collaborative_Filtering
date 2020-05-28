@@ -95,44 +95,52 @@ def root_mean_squared_error(predictions: np.array, ratings: np.array) -> float:
 
 
 def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProperties):
-    train_indices, test_indices = eval_props.selection_strategy(
+    train_test_data_sets = eval_props.selection_strategy(
         eval_props.ratings_matrix.shape,
         eval_props.is_rated_matrix,
         eval_props.train_size
     )
 
-    kept_is_rated_matrix = selection.keep_elements_by_index(
-        eval_props.is_rated_matrix,
-        train_indices,
-        False
-    )
+    predictions_all_runs = np.array([])
+    actual_ratings_all_runs = np.array([])
 
-    similarity_matrix = similarity.create_similarity_matrix(
-        eval_props.ratings_matrix,
-        kept_is_rated_matrix,
-        eval_props.similarity
-    )
+    for train_indices, test_indices in train_test_data_sets:
 
-    dataset = data.dataset(
-        similarity_matrix,
-        eval_props.ratings_matrix,
-        kept_is_rated_matrix
-    )
-    predictions = np.empty(test_indices.shape[0])
-    actual_ratings = np.empty(test_indices.shape[0])
-
-    for i in range(test_indices.shape[0]):
-        test_index = test_indices[i]
-        predictions[i], _ = eval_props.prediction_function(
-            test_index[0],
-            test_index[1],
-            dataset
+        kept_is_rated_matrix = selection.keep_elements_by_index(
+            eval_props.is_rated_matrix,
+            train_indices,
+            False
         )
-        actual_ratings[i] = eval_props.ratings_matrix[test_index[0], test_index[1]]
+
+        similarity_matrix = similarity.create_similarity_matrix(
+            eval_props.ratings_matrix,
+            kept_is_rated_matrix,
+            eval_props.similarity
+        )
+
+        dataset = data.dataset(
+            similarity_matrix,
+            eval_props.ratings_matrix,
+            kept_is_rated_matrix
+        )
+        predictions = np.empty(test_indices.shape[0])
+        actual_ratings = np.empty(test_indices.shape[0])
+
+        for i in range(test_indices.shape[0]):
+            test_index = test_indices[i]
+            predictions[i], _ = eval_props.prediction_function(
+                test_index[0],
+                test_index[1],
+                dataset
+            )
+            actual_ratings[i] = eval_props.ratings_matrix[test_index[0], test_index[1]]
+
+        predictions_all_runs = np.concatenate((predictions_all_runs, predictions))
+        actual_ratings_all_runs = np.concatenate((actual_ratings_all_runs, actual_ratings))
 
     return eval_props.error_measurement(
-        predictions,
-        actual_ratings
+        predictions_all_runs,
+        actual_ratings_all_runs
     )
 
 _names = {

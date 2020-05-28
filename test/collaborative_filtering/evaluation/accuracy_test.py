@@ -140,7 +140,7 @@ class AccuracyEvaluationTest(unittest.TestCase):
         assert (is_rated == self.is_rated_matrix).all()
         assert train_size == self.train_size
 
-        return (self.selected_train_indices, self.selected_test_indices)
+        yield (self.selected_train_indices, self.selected_test_indices)
 
     def callback_filter_mock(self, matrix, indices, baseValue):
         assert (indices == self.selected_train_indices).all()
