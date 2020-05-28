@@ -17,11 +17,11 @@ class SelectionTest(unittest.TestCase):
         shape = (4, 3)
         is_rated = np.array([True for x in range(12)]).reshape(shape)
         #when
-        return_train_indices, return_test_indices = selection.select_indices_with_hold_out(
+        return_train_indices, return_test_indices = next(selection.select_indices_with_hold_out(
             shape,
             is_rated,
             train_size=0.5
-        )
+        ))
         #then
         expected_train_indices = np.array([
             [0, 0],
@@ -56,11 +56,11 @@ class SelectionTest(unittest.TestCase):
         ])
 
         #then
-        return_train_indices, return_test_indices = selection.select_indices_with_hold_out(
+        return_train_indices, return_test_indices = next(selection.select_indices_with_hold_out(
             shape,
             is_rated,
             train_size=0.5
-        )
+        ))
         #then
         expected_train_indices = np.array([
             (1, 2),

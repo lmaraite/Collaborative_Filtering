@@ -13,7 +13,7 @@ def select_indices_with_hold_out(shape, is_rated, train_size=0.8) -> np.array:
     size = indices.shape[0]
     max_number_elements = round(size * train_size)
     permutated_indices = random_generator.permutation(indices)
-    return (permutated_indices[:max_number_elements], permutated_indices[max_number_elements:])
+    yield (permutated_indices[:max_number_elements], permutated_indices[max_number_elements:])
 
 def select_indices_with_cross_validation(shape, is_rated, train_size=0.9):
     indices = np.array(
