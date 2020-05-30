@@ -31,10 +31,10 @@ def create_similarity_matrix(approach, algorithm, all_ratings, is_rated):
 
     side_length = all_ratings.shape[0]
     similarity_matrix = np.full((side_length, side_length), np.nan)
-    for element1 in range(side_length):
-        for element2 in range(element1+1, side_length):
-            similarity_matrix[element1, element2] = get_similarity((element1, element2), all_ratings, is_rated, algorithm)
-            similarity_matrix[element2, element1] = similarity_matrix[element1, element2]
+    for row1 in range(side_length):
+        for row2 in range(row1+1, side_length):
+            similarity_matrix[row1, row2] = get_similarity((row1, row2), all_ratings, is_rated, algorithm)
+            similarity_matrix[row2, row1] = similarity_matrix[row1, row2]
     return similarity_matrix
 
 
@@ -63,9 +63,9 @@ def get_all_column_means(all_ratings, is_rated):
     Filters all 'ratings' which are actually redundant.
     Returns an array with only the column's real ratings.
 '''
-def get_actual_column_ratings(user, all_ratings, is_rated):
-    column_ratings = all_ratings[:, user]
-    return column_ratings[is_rated[:, user]]
+def get_actual_column_ratings(column, all_ratings, is_rated):
+    column_ratings = all_ratings[:, column]
+    return column_ratings[is_rated[:, column]]
 
 
 '''
@@ -75,8 +75,8 @@ def get_actual_column_ratings(user, all_ratings, is_rated):
     The adjustment and/or computation will only take place if there are enough co_ratings to prevent computation errors.
     Returns the computed similarity or nan if there are too few co_ratings.
 '''
-def get_similarity(element_ids, all_ratings, is_rated, mode):
-    co_ratings = get_co_ratings(element_ids, all_ratings, is_rated)
+def get_similarity(rows, all_ratings, is_rated, mode):
+    co_ratings = get_co_ratings(rows, all_ratings, is_rated)
     if less_than_x_co_ratings(co_ratings, 2):
         return np.nan
     elif mode == PEARSON:
@@ -88,13 +88,13 @@ def get_similarity(element_ids, all_ratings, is_rated, mode):
 
 '''
     Collects all co_ratings by masking all_ratings with a boolean is_co_rated array.
-    Returns the compiled array of co_ratings.
+    Returns the compiled array of co_ratings in the format (number_of_co_ratings * 2).
 '''
-def get_co_ratings(element_ids, all_ratings, is_rated):
-    is_co_rated = get_is_co_rated(element_ids, is_rated)
-    ratings_element1 = all_ratings[element_ids[0]]
-    ratings_element2 = all_ratings[element_ids[1]]
-    co_ratings = np.vstack((ratings_element1[is_co_rated], ratings_element2[is_co_rated]))
+def get_co_ratings(rows, all_ratings, is_rated):
+    is_co_rated = get_is_co_rated(rows, is_rated)
+    ratings_row1 = all_ratings[rows[0]]
+    ratings_row2 = all_ratings[rows[1]]
+    co_ratings = np.vstack((ratings_row1[is_co_rated], ratings_row2[is_co_rated]))
 
     # Transposing to get vertical alignment for further computations.
     return co_ratings.T
@@ -102,10 +102,10 @@ def get_co_ratings(element_ids, all_ratings, is_rated):
 
 '''
     Uses a logical AND to produce a boolean array that can be used as a mask on the original ratings matrix.
-    Returns boolean information about whether the given pair of elements share ratings.
+    Returns boolean information about whether the given pair of rows share ratings.
 '''
-def get_is_co_rated(element_ids, is_rated):
-    return np.logical_and(is_rated[element_ids[0]], is_rated[element_ids[1]])
+def get_is_co_rated(rows, is_rated):
+    return np.logical_and(is_rated[rows[0]], is_rated[rows[1]])
 
 
 '''
@@ -117,8 +117,7 @@ def less_than_x_co_ratings(co_ratings, x):
 
 
 '''
-    Adjusts the co_ratings to pearson by subtracting the means of the element-specific co_ratings according
-    to (Gross,  2016, p.7-9).
+    Adjusts the co_ratings to pearson according to (Gross,  2016, p.7-9).
     Returns the adjusted co_ratings.
 '''
 def get_pearson_adjusted_co_ratings(co_ratings):
@@ -126,8 +125,8 @@ def get_pearson_adjusted_co_ratings(co_ratings):
 
 
 '''
-    The final step to compute the similarity between two elements according to (Jannach et. al, 2011, p.19). 
-    Would produce a RuntimeWarning when a division by zero is attempted. This is ignored because in these cases
+    The final step to compute the similarity between two elements according to (Jannach et al., 2011, p.19). 
+    Would raise a RuntimeWarning when a division by zero is attempted. This is ignored because in these cases
     nan will be returned which is expected behavior.
     Returns the resulting similarity.
 '''
