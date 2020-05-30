@@ -3,7 +3,6 @@ import warnings
 from numpy.linalg import norm
 
 
-# TODO: Correct all issues with adjusted cosine.
 # TODO: Find a faster solution for numpy iteration with two-dimensional indexing.
 # TODO: Implement function to check for invalid input (approach, algorithm).
 # TODO: Use reST and Sphinx for documentation.
@@ -18,8 +17,8 @@ USER_BASED = "user_based"
 '''
     Creates a similarity-matrix by iterating over all_ratings and saving every similarity at both
     destinations at the same time to prevent a second computation of the same similarity.
+    To run "adjusted_cosine" efficiently the order of operations is changed.
     In case of USER_BASED the matrices have to be transposed.
-    To run "adjusted_cosine" efficiently the order of operations is changed. 
     It is not a clean solution but it will stay like this for the time being.
     Returns the whole matrix.
 '''
@@ -41,7 +40,7 @@ def create_similarity_matrix(approach, algorithm, all_ratings, is_rated):
 
 '''
     To avoid the repeated computation of the same means all_ratings gets adjusted to "adjusted_cosine" in advance.
-    Returns an adjusted version of all_ratings in which all user means have already been subtracted.
+    Returns an adjusted version of all_ratings in which all column means have already been subtracted column-wise.
 '''
 def get_adjusted_cosine_ratings(all_ratings, is_rated):
     all_column_means = get_all_column_means(all_ratings, is_rated)
@@ -49,7 +48,7 @@ def get_adjusted_cosine_ratings(all_ratings, is_rated):
 
 
 '''
-    Returns an array with all user means.
+    Returns an array with all column means.
 '''
 def get_all_column_means(all_ratings, is_rated):
     number_of_columns = all_ratings.shape[1]
@@ -62,7 +61,7 @@ def get_all_column_means(all_ratings, is_rated):
 
 '''
     Filters all 'ratings' which are actually redundant.
-    Returns an array with only the user's real ratings.
+    Returns an array with only the column's real ratings.
 '''
 def get_actual_column_ratings(user, all_ratings, is_rated):
     column_ratings = all_ratings[:, user]
@@ -89,10 +88,8 @@ def get_similarity(element_ids, all_ratings, is_rated, mode):
 
 '''
     Collects all co_ratings by masking all_ratings with a boolean is_co_rated array.
-    If two users rated the same item the co_rating will be added.
     Returns the compiled array of co_ratings.
 '''
-# TODO: Find a way to index both rows at the same time to avoid vstack.
 def get_co_ratings(element_ids, all_ratings, is_rated):
     is_co_rated = get_is_co_rated(element_ids, is_rated)
     ratings_element1 = all_ratings[element_ids[0]]
@@ -105,7 +102,7 @@ def get_co_ratings(element_ids, all_ratings, is_rated):
 
 '''
     Uses a logical AND to produce a boolean array that can be used as a mask on the original ratings matrix.
-    Returns boolean information about whether the given pair of elements share ratings by individual users.
+    Returns boolean information about whether the given pair of elements share ratings.
 '''
 def get_is_co_rated(element_ids, is_rated):
     return np.logical_and(is_rated[element_ids[0]], is_rated[element_ids[1]])

@@ -26,7 +26,8 @@ for approach in approaches:
         np.savetxt("../output/" + approach + "_" + algorithm + "_similarity_matrix.csv", similarity_matrix, delimiter=",", fmt="%s")
 
         local_elapsed_time = timeit.default_timer() - local_start_time
-        print("The program has taken " + str(local_elapsed_time) + " seconds to create and save the " + approach + "_" + algorithm + "_similarity_matrix.")
+        print("The program has taken " + str(local_elapsed_time) + " seconds to create and save the "
+              + approach + "_" + algorithm + "_similarity_matrix.")
 
 global_elapsed_time = timeit.default_timer() - global_start_time
 print("The program has taken " + str(global_elapsed_time) + " seconds to execute completely.")
