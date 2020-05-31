@@ -2,7 +2,6 @@
 from prediction.data import dataset
 from prediction.neighborhood import get_nearest_neighbors, has_rated
 import numpy as np
-import math
 
 """
 Item based:
@@ -53,13 +52,14 @@ def predicition_pearson_correlation(key_id: int, element_id: int, data: dataset)
     """
     nearest_neighbors = get_nearest_neighbors(MAX_NEAREST_NEIGHBORS, key_id, element_id, data)
     add_pearson_average(key_id, nearest_neighbors, data)
+    key_average = np.average(data.rating_matrix[key_id])
     counter, denominator = 0, 0
     for it in nearest_neighbors:
         counter += it.similarity * (it.rating - it.pearson_average)
         denominator += it.similarity
     if denominator == 0:
         return 0, 0
-    return counter / denominator, len(nearest_neighbors)
+    return key_average + counter / denominator, len(nearest_neighbors)
 
 
 def get_top_n_list(n: int, user_id, data: dataset) -> list:

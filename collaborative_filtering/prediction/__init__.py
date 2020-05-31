@@ -1,7 +1,6 @@
-import sys
-import os
-import site
+import sys, site, os
 
-cwd = os.path.abspath(sys.path[0])
-collaborative_filtering_dir = os.path.join(cwd, "..", "collaborative_filtering")
+cwd = sys.path[0]
+cwd = os.path.abspath(cwd)
+collaborative_filtering_dir = os.path.join(cwd, "..")
 site.addsitedir(collaborative_filtering_dir)

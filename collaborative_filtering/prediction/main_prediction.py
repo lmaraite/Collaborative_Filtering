@@ -1,5 +1,6 @@
-from collaborative_filtering.prediction.prediction import get_top_n_list, predicition_cosine_similarity, predicition_pearson_correlation
-from collaborative_filtering.prediction.data import dataset
+#!
+from prediction.prediction import get_top_n_list, predicition_cosine_similarity, predicition_pearson_correlation
+from prediction.data import dataset
 import numpy as np
 
 similarity_matrix = np.genfromtxt("../../output/item_based_pearson_similarity_matrix.csv", delimiter=",")
