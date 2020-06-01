@@ -101,8 +101,8 @@ def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProper
         eval_props.train_size
     )
 
-    predictions_all_runs = np.array([])
-    actual_ratings_all_runs = np.array([])
+    predictions_all_runs = []
+    actual_ratings_all_runs = []
 
     for train_indices, test_indices in train_test_data_sets:
 
@@ -123,20 +123,20 @@ def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProper
             eval_props.ratings_matrix,
             kept_is_rated_matrix
         )
-        predictions = np.empty(test_indices.shape[0])
-        actual_ratings = np.empty(test_indices.shape[0])
+        predictions = []
+        actual_ratings = []
 
-        for i in range(test_indices.shape[0]):
-            test_index = test_indices[i]
-            predictions[i], _ = eval_props.prediction_function(
+        for test_index in test_indices:
+            prediction, _ = eval_props.prediction_function(
                 test_index[0],
                 test_index[1],
                 dataset
             )
-            actual_ratings[i] = eval_props.ratings_matrix[test_index[0], test_index[1]]
+            predictions.append(prediction)
+            actual_ratings.append(eval_props.ratings_matrix[test_index[0], test_index[1]])
 
-        predictions_all_runs = np.concatenate((predictions_all_runs, predictions))
-        actual_ratings_all_runs = np.concatenate((actual_ratings_all_runs, actual_ratings))
+        predictions_all_runs = predictions_all_runs + predictions
+        actual_ratings_all_runs = actual_ratings_all_runs + actual_ratings
 
     return eval_props.error_measurement(
         predictions_all_runs,

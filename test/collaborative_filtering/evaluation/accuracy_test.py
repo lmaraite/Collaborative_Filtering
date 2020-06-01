@@ -144,10 +144,12 @@ class AccuracyEvaluationTest(unittest.TestCase):
         assert_are_same_matrices(is_rated, self.is_rated_matrix)
         assert train_size == self.train_size
 
-        yield (self.selected_train_indices, self.selected_test_indices)
+        self.selected_train_indices_iter = iter(self.selected_train_indices)
+
+        yield (self.selected_train_indices_iter, iter(self.selected_test_indices))
 
     def callback_filter_mock(self, matrix, indices, baseValue):
-        assert_are_same_matrices(indices, self.selected_train_indices)
+        assert indices == self.selected_train_indices_iter
         assert_are_same_matrices(matrix, self.is_rated_matrix)
         assert baseValue == False
 
