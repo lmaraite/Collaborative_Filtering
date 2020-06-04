@@ -1,3 +1,6 @@
+import sys, site, os
+site.addsitedir(os.path.join(os.path.abspath(sys.path[0]), ".."))
+
 import numpy as np
 import timeit
 import similarity
