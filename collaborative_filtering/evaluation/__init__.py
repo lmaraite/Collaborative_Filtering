@@ -2,7 +2,7 @@ import numpy as np
 import functools
 import textwrap
 
-import similarity
+from similarity import similarity
 from evaluation import selection
 
 class EvaluationProperties(object):

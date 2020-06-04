@@ -13,7 +13,7 @@ import threading
 from evaluation import accuracy as ac
 from evaluation import selection
 from input import filesystem
-import similarity
+from similarity import similarity
 
 ratings_matrix = filesystem.read_ratings_matrix() # movie x user matrix
 is_rated_matrix = filesystem.read_is_rated_matrix()

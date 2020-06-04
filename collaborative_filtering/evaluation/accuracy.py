@@ -3,7 +3,7 @@ import math
 import textwrap
 
 from evaluation import EvaluationProperties, EvaluationPropertiesBuilder, selection
-import similarity
+from similarity import similarity
 import prediction.data as data
 import prediction.prediction as prediction
 

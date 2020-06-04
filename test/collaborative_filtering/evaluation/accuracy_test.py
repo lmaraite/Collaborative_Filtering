@@ -6,7 +6,7 @@ import pytest
 from evaluation import accuracy as ac
 from evaluation import selection
 from evaluation.accuracy import SinglePredictionAccuracyEvaluationPropertiesBuilder, SinglePredictionAccuracyEvaluationProperties
-from similarity import PEARSON, COSINE
+from similarity.similarity import PEARSON, COSINE
 import prediction.prediction as prediction
 
 class ErrorTest(unittest.TestCase):
@@ -184,7 +184,7 @@ class AccuracyEvaluationTest(unittest.TestCase):
         self.filter_mock.side_effect = self.callback_filter_mock
 
         self.similarity_creation_mock = mocker.patch(
-            "similarity.create_similarity_matrix"
+            "similarity.similarity.create_similarity_matrix"
         )
         self.similarity_creation_mock.side_effect = self.callback_similarity_creation_mock
 
