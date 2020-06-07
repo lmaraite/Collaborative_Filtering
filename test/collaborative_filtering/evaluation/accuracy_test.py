@@ -187,10 +187,11 @@ class AccuracyEvaluationTest(unittest.TestCase):
 
         return self.filtered_is_rated
 
-    def callback_similarity_creation_mock(self, all_ratings, is_rated, mode):
+    def callback_similarity_creation_mock(self, approach, algorithm, all_ratings, is_rated):
         assert (all_ratings == self.ratings_matrix).all()
         assert (is_rated == self.filtered_is_rated).all()
-        assert mode == COSINE
+        assert algorithm == COSINE
+        assert approach == ITEM_BASED
 
         return self.similarity_matrix
 
@@ -204,7 +205,7 @@ class AccuracyEvaluationTest(unittest.TestCase):
         return self.prediction_return
 
     def callback_error_measurement_mock(self, predictions, ratings):
-        assert (predictions == np.array([self.prediction_return])).all()
+        assert (predictions == np.array([self.prediction_return[0]])).all()
         assert (ratings == np.array([self.ratings_matrix[0, 2]])).all()
 
         return self.error_return
@@ -244,6 +245,7 @@ class AccuracyEvaluationTest(unittest.TestCase):
             COSINE,
             selection.select_indices_with_hold_out,
             self.train_size,
+            ITEM_BASED,
             ac.root_mean_squared_error,
             prediction.predicition_cosine_similarity
         )

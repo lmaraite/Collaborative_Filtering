@@ -118,9 +118,10 @@ def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProper
     )
 
     similarity_matrix = similarity.create_similarity_matrix(
+        eval_props.approach,
+        eval_props.similarity,
         eval_props.ratings_matrix,
-        kept_is_rated_matrix,
-        eval_props.similarity
+        kept_is_rated_matrix
     )
 
     dataset = data.dataset(
