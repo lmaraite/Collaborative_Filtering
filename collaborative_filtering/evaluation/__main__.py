@@ -13,7 +13,7 @@ import threading
 from evaluation import accuracy as ac
 from evaluation import selection
 from input import filesystem
-import similarity
+from similarity import similarity
 
 ratings_matrix = filesystem.read_ratings_matrix() # movie x user matrix
 is_rated_matrix = filesystem.read_is_rated_matrix()
@@ -34,22 +34,24 @@ def print_result(evaluation: EvaluationThread):
 
 #Pearson correlation and item-based
 pearson_item_based_prop = ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
-    .with_ratings_matrix(ratings_matrix) \
-    .with_is_rated_matrix(is_rated_matrix) \
+    .with_ratings_matrix(ratings_matrix, 1) \
+    .with_is_rated_matrix(is_rated_matrix, 1) \
     .with_similarity(similarity.PEARSON) \
     .with_selection_strategy(selection.select_indices_with_hold_out) \
     .with_train_size(0.8) \
+    .with_approach(similarity.ITEM_BASED) \
     .with_error_measurement(ac.root_mean_squared_error).build()
 
 pearson_item_based = EvaluationThread(ac.run_accuracy_evaluation, pearson_item_based_prop)
 
 #Raw cosine similarity and item-based
 cosine_item_based_prop = ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
-    .with_ratings_matrix(ratings_matrix) \
-    .with_is_rated_matrix(is_rated_matrix) \
+    .with_ratings_matrix(ratings_matrix, 1) \
+    .with_is_rated_matrix(is_rated_matrix, 1) \
     .with_similarity(similarity.COSINE) \
     .with_selection_strategy(selection.select_indices_with_hold_out) \
     .with_train_size(0.8) \
+    .with_approach(similarity.ITEM_BASED) \
     .with_error_measurement(ac.root_mean_squared_error).build()
 
 cosine_item_based = EvaluationThread(ac.run_accuracy_evaluation, cosine_item_based_prop)
