@@ -65,5 +65,6 @@ def keep_elements_by_index(matrix: np.ndarray, indices: np.array, baseValue: obj
     return kept_matrix
 
 _names = {
-    select_indices_with_hold_out: "Hold Out"
+    select_indices_with_hold_out: "Hold Out",
+    select_indices_with_cross_validation: "Cross Validation"
 }
