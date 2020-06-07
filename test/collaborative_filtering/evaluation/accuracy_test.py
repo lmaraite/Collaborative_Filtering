@@ -54,8 +54,8 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilderTest(unittest.TestCase)
     def test_builder_should_throw_error_without_error_measurement(self):
         with pytest.raises(ValueError):
             SinglePredictionAccuracyEvaluationPropertiesBuilder() \
-                .with_is_rated_matrix(np.array([])) \
-                .with_ratings_matrix(np.array([])) \
+                .with_is_rated_matrix(np.array([]), 0) \
+                .with_ratings_matrix(np.array([]), 0) \
                 .with_similarity("test") \
                 .with_selection_strategy(self.dummy_function) \
                 .build()
@@ -74,8 +74,8 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilderTest(unittest.TestCase)
         ])
         #when
         evaluation_properties = SinglePredictionAccuracyEvaluationPropertiesBuilder() \
-            .with_ratings_matrix(ratings_matrix) \
-            .with_is_rated_matrix(is_rated) \
+            .with_ratings_matrix(ratings_matrix, 1) \
+            .with_is_rated_matrix(is_rated, 1) \
             .with_similarity(COSINE) \
             .with_selection_strategy(self.dummy_function) \
             .with_error_measurement(self.dummy_function) \

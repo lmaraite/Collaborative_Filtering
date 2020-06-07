@@ -37,12 +37,20 @@ class EvaluationPropertiesBuilder(object):
         self.selection_strategy = None
         self.train_size = 0.8
 
-    def with_ratings_matrix(self, ratings_matrix):
-        self.ratings_matrix = ratings_matrix
+    def with_ratings_matrix(self, ratings_matrix, user_axis):
+        if user_axis == 0:
+            self.ratings_matrix = ratings_matrix.T
+        else:
+            self.ratings_matrix = ratings_matrix
+
         return self
 
-    def with_is_rated_matrix(self, is_rated_matrix):
-        self.is_rated_matrix = is_rated_matrix
+    def with_is_rated_matrix(self, is_rated_matrix, user_axis):
+        if user_axis == 0:
+            self.is_rated_matrix = is_rated_matrix.T
+        else:
+            self.is_rated_matrix = is_rated_matrix
+
         return self
 
     def with_similarity(self, similarity):
