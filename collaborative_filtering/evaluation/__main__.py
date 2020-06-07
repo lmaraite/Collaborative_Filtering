@@ -37,9 +37,9 @@ pearson_item_based_prop = ac.SinglePredictionAccuracyEvaluationPropertiesBuilder
     .with_ratings_matrix(ratings_matrix, 1) \
     .with_is_rated_matrix(is_rated_matrix, 1) \
     .with_similarity(similarity.PEARSON) \
-    .with_selection_strategy(selection.select_indices_with_hold_out) \
-    .with_train_size(0.8) \
     .with_approach(similarity.ITEM_BASED) \
+    .with_selection_strategy(selection.select_indices_with_cross_validation) \
+    .with_train_size(0.95) \
     .with_error_measurement(ac.root_mean_squared_error).build()
 
 pearson_item_based = EvaluationThread(ac.run_accuracy_evaluation, pearson_item_based_prop)
@@ -49,9 +49,10 @@ cosine_item_based_prop = ac.SinglePredictionAccuracyEvaluationPropertiesBuilder(
     .with_ratings_matrix(ratings_matrix, 1) \
     .with_is_rated_matrix(is_rated_matrix, 1) \
     .with_similarity(similarity.COSINE) \
-    .with_selection_strategy(selection.select_indices_with_hold_out) \
-    .with_train_size(0.8) \
+
     .with_approach(similarity.ITEM_BASED) \
+    .with_selection_strategy(selection.select_indices_with_cross_validation) \
+    .with_train_size(0.95) \
     .with_error_measurement(ac.root_mean_squared_error).build()
 
 cosine_item_based = EvaluationThread(ac.run_accuracy_evaluation, cosine_item_based_prop)

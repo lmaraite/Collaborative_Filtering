@@ -10,6 +10,10 @@ from similarity.similarity import PEARSON, COSINE, ITEM_BASED, USER_BASED
 import prediction.prediction as prediction
 from prediction.data import dataset
 
+def assert_are_same_matrices(first_matrix, second_matrix):
+    assert first_matrix.shape == second_matrix.shape
+    assert (first_matrix == second_matrix).all()
+
 class ErrorTest(unittest.TestCase):
 
     def test_error_of_prediction_for_4_and_3(self):
@@ -175,14 +179,16 @@ class AccuracyEvaluationTest(unittest.TestCase):
     #callbacks with assertions
     def callback_selection_strategy_mock(self, shape, is_rated, train_size):
         assert shape == (2, 3)
-        assert (is_rated == self.is_rated_matrix).all()
+        assert_are_same_matrices(is_rated, self.is_rated_matrix)
         assert train_size == self.train_size
 
-        return (self.selected_train_indices, self.selected_test_indices)
+        self.selected_train_indices_iter = iter(self.selected_train_indices)
+
+        yield (self.selected_train_indices_iter, iter(self.selected_test_indices))
 
     def callback_filter_mock(self, matrix, indices, baseValue):
-        assert (indices == self.selected_train_indices).all()
-        assert (matrix == self.is_rated_matrix).all()
+        assert indices == self.selected_train_indices_iter
+        assert_are_same_matrices(matrix, self.is_rated_matrix)
         assert baseValue == False
 
         return self.filtered_is_rated
@@ -198,15 +204,15 @@ class AccuracyEvaluationTest(unittest.TestCase):
     def callback_prediction_creation_mock(self, key_id, element_id, data):
         assert key_id == 0
         assert element_id == 2
-        assert (data.similarity_matrix == self.similarity_matrix).all()
-        assert (data.rating_matrix == self.ratings_matrix).all()
-        assert (data.is_rated_matrix == self.filtered_is_rated).all()
+        assert_are_same_matrices(data.similarity_matrix, self.similarity_matrix)
+        assert_are_same_matrices(data.rating_matrix, self.ratings_matrix)
+        assert_are_same_matrices(data.is_rated_matrix, self.filtered_is_rated)
 
         return self.prediction_return
 
     def callback_error_measurement_mock(self, predictions, ratings):
-        assert (predictions == np.array([self.prediction_return[0]])).all()
-        assert (ratings == np.array([self.ratings_matrix[0, 2]])).all()
+        assert predictions == [self.prediction_return[0]]
+        assert ratings == [self.ratings_matrix[0, 2]]
 
         return self.error_return
 
@@ -254,3 +260,69 @@ class AccuracyEvaluationTest(unittest.TestCase):
         error = ac.run_accuracy_evaluation(eval_props)
         #then
         assert error == self.error_return
+
+@pytest.fixture
+def mock_empty(mocker):
+    mocker.patch("evaluation.selection.select_indices_with_hold_out")
+    mocker.patch("evaluation.selection.keep_elements_by_index")
+    mocker.patch("similarity.similarity.create_similarity_matrix")
+    mocker.patch("prediction.prediction.predicition_cosine_similarity")
+    mocker.patch("evaluation.accuracy.root_mean_squared_error")
+
+def cross_validation_mock_callback(shape, is_rated_matrix, train_size):
+    yield iter([(1, 0), (2, 0)]), iter([(0, 0)])
+    yield iter([(0, 0)]), iter([(1, 0), (2, 0)])
+
+def prediction_function_mock_callback(key_id, element_id, dataset):
+    assert key_id in [0, 1, 2]
+    assert element_id == 0
+
+    if key_id == 0:
+        return 2, -1
+    if key_id == 1:
+        return 5, -1
+    if key_id == 2:
+        return 1, -1
+
+def error_function_mock_callback(predictions, actual_ratings):
+    assert predictions in [[2], [5, 1]]
+    assert actual_ratings in [[4], [1, 4]]
+
+    if predictions == [2] and actual_ratings == [4]:
+        return 2
+    elif predictions == [5, 1] and actual_ratings == [1, 4]:
+        return 3.5
+
+def test_run_accuracy_evaluation_error_with_multiple_splits(mock_empty, mocker):
+    #given
+    select_strategy_mock = mocker.patch("evaluation.selection.select_indices_with_cross_validation")
+    select_strategy_mock.side_effect = cross_validation_mock_callback
+
+    prediction_function_mock = mocker.patch("prediction.prediction.predicition_cosine_similarity")
+    prediction_function_mock.side_effect = prediction_function_mock_callback
+
+    error_function_mock = mocker.patch("evaluation.accuracy.root_mean_squared_error")
+    error_function_mock.side_effect = error_function_mock_callback
+
+    ratings_matrix = np.array([
+        [4],
+        [1],
+        [4]
+    ])
+    is_rated_matrix = ratings_matrix != 0
+
+    eval_props = SinglePredictionAccuracyEvaluationProperties(
+        ratings_matrix,
+        is_rated_matrix,
+        COSINE,
+        selection.select_indices_with_cross_validation,
+        0.8,
+        ITEM_BASED,
+        ac.root_mean_squared_error,
+        prediction.predicition_cosine_similarity
+    )
+
+    #when
+    error = ac.run_accuracy_evaluation(eval_props)
+    #then
+    assert error == 2.75

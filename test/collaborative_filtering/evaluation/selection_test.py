@@ -17,11 +17,11 @@ class SelectionTest(unittest.TestCase):
         shape = (4, 3)
         is_rated = np.array([True for x in range(12)]).reshape(shape)
         #when
-        return_train_indices, return_test_indices = selection.select_indices_with_hold_out(
+        return_train_indices, return_test_indices = next(selection.select_indices_with_hold_out(
             shape,
             is_rated,
             train_size=0.5
-        )
+        ))
         #then
         expected_train_indices = np.array([
             [0, 0],
@@ -56,11 +56,11 @@ class SelectionTest(unittest.TestCase):
         ])
 
         #then
-        return_train_indices, return_test_indices = selection.select_indices_with_hold_out(
+        return_train_indices, return_test_indices = next(selection.select_indices_with_hold_out(
             shape,
             is_rated,
             train_size=0.5
-        )
+        ))
         #then
         expected_train_indices = np.array([
             (1, 2),
@@ -104,3 +104,111 @@ class SelectionTest(unittest.TestCase):
         ])
 
         assert (filtered_matrix == expected_matrix).all()
+
+    def test_cross_validation_with_train_size_08(self):
+        #given
+        shape = (1, 5)
+        is_rated = np.array([True for x in range(5)]).reshape(shape)
+
+        #when
+        train_test_sets = selection.select_indices_with_cross_validation(shape, is_rated, 0.8)
+
+        #then
+        expected_train_indices = np.array([
+            [(0, 4), (0, 2), (0, 3), (0, 1)],
+            [(0, 4), (0, 2), (0, 3), (0, 0)],
+            [(0, 4), (0, 2), (0, 1), (0, 0)],
+            [(0, 4), (0, 3), (0, 1), (0, 0)],
+            [(0, 2), (0, 3), (0, 1), (0, 0)]
+        ])
+
+        expected_test_indices = np.array([
+            [(0, 0)],
+            [(0, 1)],
+            [(0, 3)],
+            [(0, 2)],
+            [(0, 4)]
+        ])
+
+        counter_splits = 0
+        for train_return, test_return in train_test_sets:
+            assert list(train_return) in expected_train_indices
+            assert list(test_return) in expected_test_indices
+            counter_splits += 1
+
+        assert counter_splits == 5
+
+    def test_cross_validation_with_is_rated_matrix(self):
+        #given
+        shape = (1, 6)
+        is_rated = np.array([True, True, True, True, True, False])
+
+        #when
+        train_test_sets = selection.select_indices_with_cross_validation(shape, is_rated, 0.8)
+
+        #then
+        expected_train_indices = np.array([
+            [(0, 4), (0, 2), (0, 3), (0, 1)],
+            [(0, 4), (0, 2), (0, 3), (0, 0)],
+            [(0, 4), (0, 2), (0, 1), (0, 0)],
+            [(0, 4), (0, 3), (0, 1), (0, 0)],
+            [(0, 2), (0, 3), (0, 1), (0, 0)]
+        ])
+
+        expected_test_indices = np.array([
+            [(0, 0)],
+            [(0, 1)],
+            [(0, 3)],
+            [(0, 2)],
+            [(0, 4)]
+        ])
+
+        counter_splits = 0
+        for train_return, test_return in train_test_sets:
+            assert list(train_return) in expected_train_indices
+            assert list(test_return) in expected_test_indices
+            counter_splits += 1
+
+        assert counter_splits == 5
+
+    def test_cross_validation_with_undevidable_shape(self):
+        # segments = [
+        #     [(0, 4), (0, 1],
+        #     [(0, 2), (0, 0)],
+        #     [(0, 3)]
+        # ]
+        #given
+        shape = (1, 5)
+        is_rated = np.array([True for x in range(5)]).reshape(shape)
+
+        #when
+        train_test_sets = selection.select_indices_with_cross_validation(shape, is_rated, 0.7)
+
+        #then
+        expected_train_indices = [
+            [[0, 4], [0, 1], [0, 2], [0, 0]],
+            [[0, 4], [0, 1], [0, 3]],
+            [[0, 2], [0, 0], [0, 3]],
+        ]
+
+        expected_test_indices = [
+            [[0, 3]],
+            [[0, 4], [0, 1]],
+            [[0, 2], [0, 0]]
+        ]
+
+        counter_splits = 0
+        for train_return, test_return in train_test_sets:
+            train_return = map(
+                lambda pair: pair.tolist(),
+                train_return
+            )
+            test_return = map(
+                lambda pair: pair.tolist(),
+                test_return
+            )
+            assert list(train_return) in expected_train_indices
+            assert list(test_return) in expected_test_indices
+            counter_splits += 1
+
+        assert counter_splits == 3
