@@ -2,6 +2,9 @@ import numpy as np
 import math
 import textwrap
 import statistics
+import itertools
+import multiprocessing
+import _pickle
 
 from evaluation import EvaluationProperties, EvaluationPropertiesBuilder, selection
 from similarity import similarity
@@ -104,6 +107,38 @@ def root_mean_squared_error(predictions: np.array, ratings: np.array) -> float:
         ) / len(predictions)
      )
 
+def _run_single_test_case(train_indices, test_indices, eval_props: SinglePredictionAccuracyEvaluationProperties):
+    kept_is_rated_matrix = selection.keep_elements_by_index(
+        eval_props.is_rated_matrix,
+        train_indices,
+        False
+    )
+
+    similarity_matrix = similarity.create_similarity_matrix(
+        eval_props.approach,
+        eval_props.similarity,
+        eval_props.ratings_matrix,
+        kept_is_rated_matrix
+    )
+
+    dataset = data.dataset(
+        similarity_matrix,
+        eval_props.ratings_matrix,
+        kept_is_rated_matrix
+    )
+    predictions = []
+    actual_ratings = []
+
+    for test_index in test_indices:
+        prediction, _ = eval_props.prediction_function(
+            test_index[0],
+            test_index[1],
+            dataset
+        )
+        predictions.append(prediction)
+        actual_ratings.append(eval_props.ratings_matrix[test_index[0], test_index[1]])
+
+    return eval_props.error_measurement(predictions, actual_ratings)
 
 def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProperties):
     train_test_data_sets = eval_props.selection_strategy(
@@ -114,40 +149,32 @@ def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProper
 
     all_errors = []
 
-    for train_indices, test_indices in train_test_data_sets:
+    train_test_data_sets = list(map(
+            lambda indices_tuple: (list(indices_tuple[0]), list(indices_tuple[1])),
+            train_test_data_sets
+        ))
 
-        kept_is_rated_matrix = selection.keep_elements_by_index(
-            eval_props.is_rated_matrix,
-            train_indices,
-            False
-        )
-
-        similarity_matrix = similarity.create_similarity_matrix(
-            eval_props.approach,
-            eval_props.similarity,
-            eval_props.ratings_matrix,
-            kept_is_rated_matrix
-        )
-
-        dataset = data.dataset(
-            similarity_matrix,
-            eval_props.ratings_matrix,
-            kept_is_rated_matrix
-        )
-        predictions = []
-        actual_ratings = []
-
-        for test_index in test_indices:
-            prediction, _ = eval_props.prediction_function(
-                test_index[0],
-                test_index[1],
-                dataset
+    try:
+        # The following two lines can't be easily tested due to limitations of Pickling of Mocks
+        with multiprocessing.Pool() as pool:
+            all_errors = pool.starmap(_run_single_test_case,
+                map(
+                    lambda tuple: (*tuple[0], tuple[1]),
+                    zip(
+                        train_test_data_sets,
+                        itertools.repeat(eval_props)
+                    )
+                )
             )
-            predictions.append(prediction)
-            actual_ratings.append(eval_props.ratings_matrix[test_index[0], test_index[1]])
-
-        error = eval_props.error_measurement(predictions, actual_ratings)
-        all_errors.append(error)
+    except _pickle.PicklingError as e:
+        for train_indices, test_indices, props in map(
+            lambda tuple: (*tuple[0], tuple[1]),
+            zip(
+                train_test_data_sets,
+                itertools.repeat(eval_props)
+            )
+        ):
+            all_errors.append(_run_single_test_case(train_indices, test_indices, props))
 
     return statistics.mean(all_errors)
 
