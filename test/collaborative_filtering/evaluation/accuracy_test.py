@@ -6,8 +6,9 @@ import pytest
 from evaluation import accuracy as ac
 from evaluation import selection
 from evaluation.accuracy import SinglePredictionAccuracyEvaluationPropertiesBuilder, SinglePredictionAccuracyEvaluationProperties
-from similarity.similarity import PEARSON, COSINE
+from similarity.similarity import PEARSON, COSINE, ITEM_BASED, USER_BASED
 import prediction.prediction as prediction
+from prediction.data import dataset
 
 class ErrorTest(unittest.TestCase):
 
@@ -58,6 +59,7 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilderTest(unittest.TestCase)
                 .with_ratings_matrix(np.array([]), 0) \
                 .with_similarity("test") \
                 .with_selection_strategy(self.dummy_function) \
+                .with_approach("") \
                 .build()
 
     def test_builder(self):
@@ -77,6 +79,7 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilderTest(unittest.TestCase)
             .with_ratings_matrix(ratings_matrix, 1) \
             .with_is_rated_matrix(is_rated, 1) \
             .with_similarity(COSINE) \
+            .with_approach(ITEM_BASED) \
             .with_selection_strategy(self.dummy_function) \
             .with_error_measurement(self.dummy_function) \
             .build()
@@ -85,6 +88,7 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilderTest(unittest.TestCase)
         assert (evaluation_properties.ratings_matrix == ratings_matrix).all()
         assert (evaluation_properties.is_rated_matrix == is_rated).all()
         assert evaluation_properties.similarity == COSINE
+        assert evaluation_properties.approach == ITEM_BASED
         assert evaluation_properties.selection_strategy == self.dummy_function
         assert evaluation_properties.error_measurement == self.dummy_function
         assert evaluation_properties.prediction_function == prediction.predicition_cosine_similarity
@@ -102,6 +106,40 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilderTest(unittest.TestCase)
             .with_similarity(COSINE)
 
         assert builder.prediction_function == prediction.predicition_cosine_similarity
+
+def test_builder_prediction_function_with_item_based(mocker):
+    #given
+    mock_pred_func = mocker.patch("prediction.prediction.predicition_cosine_similarity")
+
+    evaluation_properties_builder = SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+        .with_similarity(COSINE) \
+        .with_approach(ITEM_BASED)
+
+    #when
+    prediction_function = evaluation_properties_builder.prediction_function
+
+    #then
+    data = dataset(None, None, None)
+    prediction_function(1, 2, data)
+    mock_pred_func.assert_called_once_with(1, 2, data)
+
+
+
+def test_builder_prediction_function_with_user_based(mocker):
+    #given
+    mock_pred_func = mocker.patch("prediction.prediction.predicition_cosine_similarity")
+
+    evaluation_properties_builder = SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+        .with_similarity(COSINE) \
+        .with_approach(USER_BASED)
+
+    #when
+    prediction_function = evaluation_properties_builder.prediction_function
+
+    #then
+    data = dataset(None, None, None)
+    prediction_function(1, 2, data)
+    mock_pred_func.assert_called_once_with(2, 1, data)
 
 
 class AccuracyEvaluationTest(unittest.TestCase):

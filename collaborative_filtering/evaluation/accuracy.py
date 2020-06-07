@@ -18,6 +18,7 @@ class SinglePredictionAccuracyEvaluationProperties(EvaluationProperties):
         similarity: str,
         selection_strategy,
         train_size,
+        approach,
         error_measurement,
         prediction
     ):
@@ -26,7 +27,8 @@ class SinglePredictionAccuracyEvaluationProperties(EvaluationProperties):
             is_rated_matrix,
             similarity,
             selection_strategy,
-            train_size
+            train_size,
+            approach
         )
         self.error_measurement = error_measurement
         self.prediction_function = prediction
@@ -42,23 +44,30 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilder(EvaluationPropertiesBu
     def __init__(self):
         super().__init__()
         self.error_measurement = None
-        self.prediction_function = None
 
     def with_error_measurement(self, error_measurement):
         self.error_measurement = error_measurement
         return self
 
-    def with_similarity(self, similarity_mode):
-        super().with_similarity(similarity_mode)
-
-        if similarity_mode == similarity.PEARSON:
-            self.prediction_function = prediction.predicition_pearson_correlation
-        elif similarity_mode == similarity.COSINE:
-            self.prediction_function = prediction.predicition_cosine_similarity
-        elif similarity_mode == similarity.ADJUSTED_COSINE:
+    @property
+    def prediction_function(self):
+        if self.similarity == similarity.PEARSON:
+            prediction_function = prediction.predicition_pearson_correlation
+        elif self.similarity == similarity.COSINE:
+            prediction_function = prediction.predicition_cosine_similarity
+        elif self.similarity == similarity.ADJUSTED_COSINE:
             raise Error("Adjusted cosine is not yet implemented")
+        else:
+            return None
 
-        return self
+        if self.approach == similarity.USER_BASED:
+            return lambda key_id, element_id, data: prediction_function(
+                element_id,
+                key_id,
+                data
+            )
+
+        return prediction_function
 
     def build(self):
         if not self._are_properties_complete():
@@ -70,6 +79,7 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilder(EvaluationPropertiesBu
             self.similarity,
             self.selection_strategy,
             self.train_size,
+            self.approach,
             self.error_measurement,
             self.prediction_function
         )
