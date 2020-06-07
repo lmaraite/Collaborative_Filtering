@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import textwrap
+import statistics
 
 from evaluation import EvaluationProperties, EvaluationPropertiesBuilder, selection
 import similarity
@@ -101,8 +102,7 @@ def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProper
         eval_props.train_size
     )
 
-    predictions_all_runs = []
-    actual_ratings_all_runs = []
+    all_errors = []
 
     for train_indices, test_indices in train_test_data_sets:
 
@@ -135,13 +135,10 @@ def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProper
             predictions.append(prediction)
             actual_ratings.append(eval_props.ratings_matrix[test_index[0], test_index[1]])
 
-        predictions_all_runs = predictions_all_runs + predictions
-        actual_ratings_all_runs = actual_ratings_all_runs + actual_ratings
+        error = eval_props.error_measurement(predictions, actual_ratings)
+        all_errors.append(error)
 
-    return eval_props.error_measurement(
-        predictions_all_runs,
-        actual_ratings_all_runs
-    )
+    return statistics.mean(all_errors)
 
 _names = {
     root_mean_squared_error: "Root Mean Squared Error"
