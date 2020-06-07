@@ -6,8 +6,9 @@ import pytest
 from evaluation import accuracy as ac
 from evaluation import selection
 from evaluation.accuracy import SinglePredictionAccuracyEvaluationPropertiesBuilder, SinglePredictionAccuracyEvaluationProperties
-from similarity import PEARSON, COSINE
+from similarity.similarity import PEARSON, COSINE, ITEM_BASED, USER_BASED
 import prediction.prediction as prediction
+from prediction.data import dataset
 
 def assert_are_same_matrices(first_matrix, second_matrix):
     assert first_matrix.shape == second_matrix.shape
@@ -58,10 +59,11 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilderTest(unittest.TestCase)
     def test_builder_should_throw_error_without_error_measurement(self):
         with pytest.raises(ValueError):
             SinglePredictionAccuracyEvaluationPropertiesBuilder() \
-                .with_is_rated_matrix(np.array([])) \
-                .with_ratings_matrix(np.array([])) \
+                .with_is_rated_matrix(np.array([]), 0) \
+                .with_ratings_matrix(np.array([]), 0) \
                 .with_similarity("test") \
                 .with_selection_strategy(self.dummy_function) \
+                .with_approach("") \
                 .build()
 
     def test_builder(self):
@@ -78,9 +80,10 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilderTest(unittest.TestCase)
         ])
         #when
         evaluation_properties = SinglePredictionAccuracyEvaluationPropertiesBuilder() \
-            .with_ratings_matrix(ratings_matrix) \
-            .with_is_rated_matrix(is_rated) \
+            .with_ratings_matrix(ratings_matrix, 1) \
+            .with_is_rated_matrix(is_rated, 1) \
             .with_similarity(COSINE) \
+            .with_approach(ITEM_BASED) \
             .with_selection_strategy(self.dummy_function) \
             .with_error_measurement(self.dummy_function) \
             .build()
@@ -89,6 +92,7 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilderTest(unittest.TestCase)
         assert (evaluation_properties.ratings_matrix == ratings_matrix).all()
         assert (evaluation_properties.is_rated_matrix == is_rated).all()
         assert evaluation_properties.similarity == COSINE
+        assert evaluation_properties.approach == ITEM_BASED
         assert evaluation_properties.selection_strategy == self.dummy_function
         assert evaluation_properties.error_measurement == self.dummy_function
         assert evaluation_properties.prediction_function == prediction.predicition_cosine_similarity
@@ -106,6 +110,40 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilderTest(unittest.TestCase)
             .with_similarity(COSINE)
 
         assert builder.prediction_function == prediction.predicition_cosine_similarity
+
+def test_builder_prediction_function_with_item_based(mocker):
+    #given
+    mock_pred_func = mocker.patch("prediction.prediction.predicition_cosine_similarity")
+
+    evaluation_properties_builder = SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+        .with_similarity(COSINE) \
+        .with_approach(ITEM_BASED)
+
+    #when
+    prediction_function = evaluation_properties_builder.prediction_function
+
+    #then
+    data = dataset(None, None, None)
+    prediction_function(1, 2, data)
+    mock_pred_func.assert_called_once_with(1, 2, data)
+
+
+
+def test_builder_prediction_function_with_user_based(mocker):
+    #given
+    mock_pred_func = mocker.patch("prediction.prediction.predicition_cosine_similarity")
+
+    evaluation_properties_builder = SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+        .with_similarity(COSINE) \
+        .with_approach(USER_BASED)
+
+    #when
+    prediction_function = evaluation_properties_builder.prediction_function
+
+    #then
+    data = dataset(None, None, None)
+    prediction_function(1, 2, data)
+    mock_pred_func.assert_called_once_with(2, 1, data)
 
 
 class AccuracyEvaluationTest(unittest.TestCase):
@@ -155,9 +193,11 @@ class AccuracyEvaluationTest(unittest.TestCase):
 
         return self.filtered_is_rated
 
-    def callback_similarity_creation_mock(self, all_ratings, is_rated, mode):
-        assert_are_same_matrices(all_ratings, self.ratings_matrix)
-        assert mode == COSINE
+    def callback_similarity_creation_mock(self, approach, algorithm, all_ratings, is_rated):
+        assert (all_ratings == self.ratings_matrix).all()
+        assert (is_rated == self.filtered_is_rated).all()
+        assert algorithm == COSINE
+        assert approach == ITEM_BASED
 
         return self.similarity_matrix
 
@@ -189,7 +229,7 @@ class AccuracyEvaluationTest(unittest.TestCase):
         self.filter_mock.side_effect = self.callback_filter_mock
 
         self.similarity_creation_mock = mocker.patch(
-            "similarity.create_similarity_matrix"
+            "similarity.similarity.create_similarity_matrix"
         )
         self.similarity_creation_mock.side_effect = self.callback_similarity_creation_mock
 
@@ -211,6 +251,7 @@ class AccuracyEvaluationTest(unittest.TestCase):
             COSINE,
             selection.select_indices_with_hold_out,
             self.train_size,
+            ITEM_BASED,
             ac.root_mean_squared_error,
             prediction.predicition_cosine_similarity
         )
@@ -224,7 +265,7 @@ class AccuracyEvaluationTest(unittest.TestCase):
 def mock_empty(mocker):
     mocker.patch("evaluation.selection.select_indices_with_hold_out")
     mocker.patch("evaluation.selection.keep_elements_by_index")
-    mocker.patch("similarity.create_similarity_matrix")
+    mocker.patch("similarity.similarity.create_similarity_matrix")
     mocker.patch("prediction.prediction.predicition_cosine_similarity")
     mocker.patch("evaluation.accuracy.root_mean_squared_error")
 
@@ -276,6 +317,7 @@ def test_run_accuracy_evaluation_error_with_multiple_splits(mock_empty, mocker):
         COSINE,
         selection.select_indices_with_cross_validation,
         0.8,
+        ITEM_BASED,
         ac.root_mean_squared_error,
         prediction.predicition_cosine_similarity
     )

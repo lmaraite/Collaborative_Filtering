@@ -1,10 +1,12 @@
-The program has taken 2.150655377001385 seconds to load the data.
-The program has taken 30.213299756000197 seconds to create and save the item-based cosine-matrix.
-/home/dennis/PycharmProjects/Collaborative_Filtering/collaborative_filtering/similarity.py:127: RuntimeWarning: invalid value encountered in double_scalars
-  return np.dot(ratings[:, 0], ratings[:, 1]) / (norm(ratings[:, 0]) * norm(ratings[:, 1]))
-The program has taken 57.0473207670002 seconds to create and save the item-based adjusted_cosine-matrix.
-The program has taken 51.81409989700114 seconds to create and save the item-based pearson-matrix.
-The program has taken 17.933774440996785 seconds to create and save the user-based cosine-matrix.
-The program has taken 40.08738460099994 seconds to create and save the user-based adjusted_cosine-matrix.
-The program has taken 30.631597470997804 seconds to create and save the user-based pearson-matrix.
-The program has taken 229.87851155799945 seconds to execute completely.
+The program has taken 1.815504107000379 seconds to load the data.
+The program has taken 14.22096123799929 seconds to create and save the item_based_number_of_co_ratings_matrix.
+The program has taken 30.107686340999862 seconds to create and save the item_based_cosine_similarity_matrix.
+The program has taken 30.647308959998554 seconds to create and save the item_based_adjusted_cosine_similarity_matrix.
+The program has taken 52.44105506699998 seconds to create and save the item_based_pearson_similarity_matrix.
+The program has taken 9.090755559000172 seconds to create and save the user_based_number_of_co_ratings_matrix.
+The program has taken 18.973038954000003 seconds to create and save the user_based_cosine_similarity_matrix.
+The program has taken 18.780430605998845 seconds to create and save the user_based_adjusted_cosine_similarity_matrix.
+The program has taken 31.63461381200068 seconds to create and save the user_based_pearson_similarity_matrix.
+The program has taken 207.71167631500066 seconds to execute completely.
+
+Process finished with exit code 0
