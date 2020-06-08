@@ -29,7 +29,13 @@ class EvaluationProperties(object):
         similarity: {}
         selection strategy: {}
         train size: {}
-        """.format(self.similarity, selection._names[self.selection_strategy], self.train_size))
+        approach: {}
+        """.format(
+            self.similarity,
+            selection._names[self.selection_strategy],
+            self.train_size,
+            self.approach
+        ))
 
 class EvaluationPropertiesBuilder(object):
 

@@ -49,7 +49,6 @@ cosine_item_based_prop = ac.SinglePredictionAccuracyEvaluationPropertiesBuilder(
     .with_ratings_matrix(ratings_matrix, 1) \
     .with_is_rated_matrix(is_rated_matrix, 1) \
     .with_similarity(similarity.COSINE) \
-
     .with_approach(similarity.ITEM_BASED) \
     .with_selection_strategy(selection.select_indices_with_cross_validation) \
     .with_train_size(0.95) \
