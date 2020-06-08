@@ -104,6 +104,16 @@ def root_mean_squared_error(predictions: np.array, ratings: np.array) -> float:
         ) / len(predictions)
      )
 
+def mean_absolute_error(predictions, ratings):
+    return sum(
+        map(
+            lambda e: abs(e),
+            map(
+                lambda prediction_rating: error(prediction_rating[0], prediction_rating[1]),
+                zip(predictions, ratings)
+            )
+        )
+    ) / len(predictions)
 
 def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProperties):
     train_test_data_sets = eval_props.selection_strategy(
@@ -152,5 +162,6 @@ def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProper
     return statistics.mean(all_errors)
 
 _names = {
-    root_mean_squared_error: "Root Mean Squared Error"
+    root_mean_squared_error: "Root Mean Squared Error",
+    mean_absolute_error: "Mean Absolute Error"
 }
