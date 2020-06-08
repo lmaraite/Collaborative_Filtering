@@ -200,7 +200,8 @@ class AccuracyEvaluationTest(unittest.TestCase):
         yield (self.selected_train_indices_iter, iter(self.selected_test_indices))
 
     def callback_filter_mock(self, matrix, indices, baseValue):
-        assert indices == self.selected_train_indices_iter
+        for first, second in zip(indices, iter(self.selected_train_indices)):
+            assert (first == second).all()
         assert_are_same_matrices(matrix, self.is_rated_matrix)
         assert baseValue == False
 
