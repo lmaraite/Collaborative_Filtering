@@ -5,20 +5,23 @@ import tempfile
 import os
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "i:o:d:")
+    opts, args = getopt.getopt(sys.argv[1:], "i:o:d:s:")
 except getopt.GetoptError:
-    print("convert_movielens.py -i <inputfile> -o <name of output file without extension> [-d delimiter=',']")
+    print("convert_movielens.py -i <inputfile> -o <name of output file without extension> [-d <delimiter=','>] [-s <skiprows=0>]")
     sys.exit(1)
 
 delimiter = ","
+skiprows = 0
 
 for opt, arg in opts:
     if opt == "-i":
         movielens_file = arg
     elif opt == "-o":
         converted_file = arg
-    elif opt == "d":
+    elif opt == "-d":
         delimiter = arg
+    elif opt == "-s":
+        skiprows = arg
 
 tmp_movielens_file_fd, tmp_movielens_file_path = tempfile.mkstemp()
 
@@ -32,7 +35,7 @@ movielens_matrix = np.loadtxt(
     tmp_movielens_file_path,
     dtype=np.float32,
     delimiter=delimiter,
-    skiprows=1
+    skiprows=skiprows
 )
 print(movielens_matrix)
 max_movie = np.count_nonzero(np.unique(movielens_matrix.T[1]))
@@ -59,7 +62,7 @@ for row in movielens_matrix:
 
 is_rated_matrix = ratings_matrix != 0
 
-np.savetxt(converted_file + ".csv", ratings_matrix, delimiter=delimiter, fmt="%1.1f")
-np.savetxt(converted_file + "_is_rated.csv", is_rated_matrix, delimiter=delimiter, fmt="%d")
+np.savetxt(converted_file + ".csv", ratings_matrix, delimiter=",", fmt="%1.1f")
+np.savetxt(converted_file + "_is_rated.csv", is_rated_matrix, delimiter=",", fmt="%d")
 
 os.remove(tmp_movielens_file_path)
