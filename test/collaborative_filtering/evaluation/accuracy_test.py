@@ -36,7 +36,7 @@ class ErrorTest(unittest.TestCase):
 
 class RootMeanSquaredErrorTest(unittest.TestCase):
 
-    def test_root_mean_squared_error_for_4_values(self):
+    def test_root_mean_squared_error_for_3_values(self):
         #given
         predictions = np.array([
             4, 5, 1
@@ -51,6 +51,19 @@ class RootMeanSquaredErrorTest(unittest.TestCase):
 
         #then
         assert math.isclose(error, expected_error)
+
+class MeanAbsoluteErrorTest(unittest.TestCase):
+
+    def test_mean_absolute_error_for_4_values(self):
+        #given
+        predictions = [4, 1, 2]
+        ratings = [2, 3, 3]
+
+        #when
+        error = ac.mean_absolute_error(predictions, ratings)
+
+        #then
+        assert math.isclose(error, (5 / 3))
 
 class SinglePredictionAccuracyEvaluationPropertiesBuilderTest(unittest.TestCase):
 

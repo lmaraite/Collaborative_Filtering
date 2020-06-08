@@ -107,6 +107,17 @@ def root_mean_squared_error(predictions: np.array, ratings: np.array) -> float:
         ) / len(predictions)
      )
 
+def mean_absolute_error(predictions, ratings):
+    return sum(
+        map(
+            lambda e: abs(e),
+            map(
+                lambda prediction_rating: error(prediction_rating[0], prediction_rating[1]),
+                zip(predictions, ratings)
+            )
+        )
+    ) / len(predictions)
+
 def _run_single_test_case(train_indices, test_indices, eval_props: SinglePredictionAccuracyEvaluationProperties):
     kept_is_rated_matrix = selection.keep_elements_by_index(
         eval_props.is_rated_matrix,
@@ -179,5 +190,6 @@ def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProper
     return statistics.mean(all_errors)
 
 _names = {
-    root_mean_squared_error: "Root Mean Squared Error"
+    root_mean_squared_error: "Root Mean Squared Error",
+    mean_absolute_error: "Mean Absolute Error"
 }
