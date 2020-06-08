@@ -1,6 +1,7 @@
 import numpy as np
 import functools
 import textwrap
+import statistics
 
 from similarity import similarity
 from evaluation import selection
@@ -101,3 +102,28 @@ class EvaluationPropertiesBuilder(object):
         if self.approach is None:
             return False
         return True
+
+def analyse_data_set(ratings_matrix, is_rated_matrix, user_axis):
+    if user_axis == 0:
+        ratings_matrix = ratings_matrix.T
+        is_rated_matrix = is_rated_matrix.T
+
+    analysis = {}
+    analysis["num_of_movies"] = ratings_matrix.shape[0]
+    analysis["num_of_users"] = ratings_matrix.shape[1]
+    analysis["num_of_ratings"] = ratings_matrix[is_rated_matrix].size
+    analysis["avg_num_ratings_per_item"] = statistics.mean(
+        map(
+            lambda row_pair: row_pair[0][row_pair[1]].size,
+            zip(ratings_matrix, is_rated_matrix)
+        )
+    )
+    analysis["avg_num_ratings_per_user"] = statistics.mean(
+        map(
+            lambda row_pair: row_pair[0][row_pair[1]].size,
+            zip(ratings_matrix.T, is_rated_matrix.T)
+        )
+    )
+    analysis["avg_rating"] = np.mean(ratings_matrix[is_rated_matrix])
+
+    return analysis
