@@ -53,6 +53,9 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilder(EvaluationPropertiesBu
         self.error_measurement = error_measurement
         return self
 
+    def switch(self, key_id, element_id, data):
+        return self._prediction_function(element_id, key_id, data)
+
     @property
     def prediction_function(self):
         if self.similarity == similarity.PEARSON:
@@ -65,11 +68,8 @@ class SinglePredictionAccuracyEvaluationPropertiesBuilder(EvaluationPropertiesBu
             return None
 
         if self.approach == similarity.USER_BASED:
-            return lambda key_id, element_id, data: prediction_function(
-                element_id,
-                key_id,
-                data
-            )
+            self._prediction_function = prediction_function
+            return self.switch
 
         return prediction_function
 
