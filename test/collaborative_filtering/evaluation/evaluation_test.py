@@ -1,7 +1,9 @@
 import unittest
 import pytest
 import numpy as np
+import math
 
+import evaluation
 from evaluation import EvaluationPropertiesBuilder
 from similarity.similarity import ITEM_BASED
 
@@ -161,4 +163,22 @@ class EvaluationPropertiesBuilderTest(unittest.TestCase):
 
         #then
         assert (evaluation_properties_builder.is_rated_matrix == is_rated_matrix).all()
-        
+
+def test_analyse_data_set():
+    #given
+    ratings_matrix = np.array([
+        [3, 4, 0, 0],
+        [5, 0, 1, 2],
+        [0, 0, 3, 2]
+    ])
+
+    is_rated_matrix = ratings_matrix != 0
+    #when
+    analysis = evaluation.analyse_data_set(ratings_matrix, is_rated_matrix, 1)
+    #then
+    assert analysis["num_of_movies"] == 3
+    assert analysis["num_of_users"] == 4
+    assert analysis["num_of_ratings"] == 7
+    assert math.isclose(analysis["avg_num_ratings_per_item"], (7 / 3))
+    assert analysis["avg_num_ratings_per_user"] == 1.75
+    assert math.isclose(analysis["avg_rating"], (20 / 7))
