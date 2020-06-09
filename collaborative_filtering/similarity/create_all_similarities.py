@@ -3,7 +3,7 @@ site.addsitedir(os.path.join(os.path.abspath(sys.path[0]), ".."))
 
 import numpy as np
 import timeit
-import similarity
+from similarity import similarity
 from similarity import create_similarity_matrix, create_number_of_co_ratings_matrix
 from input.filesystem import read_ratings_matrix, read_is_rated_matrix
 
