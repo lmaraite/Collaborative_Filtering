@@ -1,8 +1,9 @@
 import numpy as np
 import functools
 import textwrap
+import statistics
 
-import similarity
+from similarity import similarity
 from evaluation import selection
 
 class EvaluationProperties(object):
@@ -13,20 +14,28 @@ class EvaluationProperties(object):
             is_rated_matrix: np.ndarray,
             similarity: str,
             selection_strategy,
-            train_size: float
+            train_size: float,
+            approach: str
         ):
         self.ratings_matrix = ratings_matrix
         self.is_rated_matrix = is_rated_matrix
         self.similarity = similarity
         self.selection_strategy = selection_strategy
         self.train_size = train_size
+        self.approach = approach
 
     def __str__(self):
         return textwrap.dedent("""\
         similarity: {}
         selection strategy: {}
         train size: {}
-        """.format(self.similarity, selection._names[self.selection_strategy], self.train_size))
+        approach: {}
+        """.format(
+            self.similarity,
+            selection._names[self.selection_strategy],
+            self.train_size,
+            self.approach
+        ))
 
 class EvaluationPropertiesBuilder(object):
 
@@ -36,13 +45,22 @@ class EvaluationPropertiesBuilder(object):
         self.similarity = None
         self.selection_strategy = None
         self.train_size = 0.8
+        self.approach = None
 
-    def with_ratings_matrix(self, ratings_matrix):
-        self.ratings_matrix = ratings_matrix
+    def with_ratings_matrix(self, ratings_matrix, user_axis):
+        if user_axis == 0:
+            self.ratings_matrix = ratings_matrix.T
+        else:
+            self.ratings_matrix = ratings_matrix
+
         return self
 
-    def with_is_rated_matrix(self, is_rated_matrix):
-        self.is_rated_matrix = is_rated_matrix
+    def with_is_rated_matrix(self, is_rated_matrix, user_axis):
+        if user_axis == 0:
+            self.is_rated_matrix = is_rated_matrix.T
+        else:
+            self.is_rated_matrix = is_rated_matrix
+
         return self
 
     def with_similarity(self, similarity):
@@ -61,6 +79,10 @@ class EvaluationPropertiesBuilder(object):
         self.train_size = train_size
         return self
 
+    def with_approach(self, approach):
+        self.approach = approach
+        return self
+
     def build(self):
         if not self._are_properties_complete():
             raise ValueError("Initialization not complete")
@@ -69,7 +91,8 @@ class EvaluationPropertiesBuilder(object):
             self.is_rated_matrix,
             self.similarity,
             self.selection_strategy,
-            self.train_size
+            self.train_size,
+            self.approach
         )
 
 
@@ -82,4 +105,31 @@ class EvaluationPropertiesBuilder(object):
             return False
         if self.selection_strategy is None:
             return False
+        if self.approach is None:
+            return False
         return True
+
+def analyse_data_set(ratings_matrix, is_rated_matrix, user_axis):
+    if user_axis == 0:
+        ratings_matrix = ratings_matrix.T
+        is_rated_matrix = is_rated_matrix.T
+
+    analysis = {}
+    analysis["num_of_movies"] = ratings_matrix.shape[0]
+    analysis["num_of_users"] = ratings_matrix.shape[1]
+    analysis["num_of_ratings"] = ratings_matrix[is_rated_matrix].size
+    analysis["avg_num_ratings_per_item"] = statistics.mean(
+        map(
+            lambda row_pair: row_pair[0][row_pair[1]].size,
+            zip(ratings_matrix, is_rated_matrix)
+        )
+    )
+    analysis["avg_num_ratings_per_user"] = statistics.mean(
+        map(
+            lambda row_pair: row_pair[0][row_pair[1]].size,
+            zip(ratings_matrix.T, is_rated_matrix.T)
+        )
+    )
+    analysis["avg_rating"] = np.mean(ratings_matrix[is_rated_matrix])
+
+    return analysis

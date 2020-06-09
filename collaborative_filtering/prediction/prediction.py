@@ -13,7 +13,7 @@ User based:
     element_id = movie_id
 """
 
-MAX_NEAREST_NEIGHBORS = 5
+MAX_NEAREST_NEIGHBORS = 20
 
 
 def predicition_cosine_similarity(key_id: int, element_id: int, data: dataset) -> tuple:
