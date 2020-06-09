@@ -10,13 +10,11 @@ site.addsitedir(collaborative_filtering_dir)
 import numpy as np
 import threading
 
+import evaluation
 from evaluation import accuracy as ac
 from evaluation import selection
 from input import filesystem
 from similarity import similarity
-
-ratings_matrix = filesystem.read_ratings_matrix() # movie x user matrix
-is_rated_matrix = filesystem.read_is_rated_matrix()
 
 class EvaluationThread(threading.Thread):
     def __init__(self, evaluation_function, evaluation_props):
@@ -31,36 +29,77 @@ class EvaluationThread(threading.Thread):
 def print_result(evaluation: EvaluationThread):
     print(evaluation.evaluation_props)
     print("Result: " + str(evaluation.result))
+    print("============")
 
-#Pearson correlation and item-based
-pearson_item_based_prop = ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+def print_analysis(analysis):
+    for name, result in analysis.items():
+        print("{}: {}".format(name, result))
+
+#dat set from ilias
+data_set_dir = os.path.join(os.path.dirname(__file__), "..", "..", "dataset")
+ratings_matrix = filesystem.read_ratings_matrix(
+    # os.path.join(data_set_dir, "movielens_100k_converted.csv")
+) # movie x user matrix
+is_rated_matrix = filesystem.read_is_rated_matrix(
+    # os.path.join(data_set_dir, "movielens_100k_converted_is_rated.csv")
+)
+
+analysis = evaluation.analyse_data_set(ratings_matrix, is_rated_matrix, 1)
+print_analysis(analysis)
+
+props = []
+
+
+
+props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
     .with_ratings_matrix(ratings_matrix, 1) \
     .with_is_rated_matrix(is_rated_matrix, 1) \
     .with_similarity(similarity.PEARSON) \
     .with_approach(similarity.ITEM_BASED) \
-    .with_selection_strategy(selection.select_indices_with_cross_validation) \
-    .with_train_size(0.95) \
-    .with_error_measurement(ac.root_mean_squared_error).build()
+    .with_selection_strategy(selection.select_indices_with_hold_out) \
+    .with_train_size(0.8) \
+    .with_error_measurement(ac.mean_absolute_error).build())
 
-pearson_item_based = EvaluationThread(ac.run_accuracy_evaluation, pearson_item_based_prop)
-
-#Raw cosine similarity and item-based
-cosine_item_based_prop = ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
     .with_ratings_matrix(ratings_matrix, 1) \
     .with_is_rated_matrix(is_rated_matrix, 1) \
-    .with_similarity(similarity.COSINE) \
-    .with_approach(similarity.ITEM_BASED) \
-    .with_selection_strategy(selection.select_indices_with_cross_validation) \
-    .with_train_size(0.95) \
-    .with_error_measurement(ac.root_mean_squared_error).build()
+    .with_similarity(similarity.PEARSON) \
+    .with_approach(similarity.USER_BASED) \
+    .with_selection_strategy(selection.select_indices_with_hold_out) \
+    .with_train_size(0.8) \
+    .with_error_measurement(ac.mean_absolute_error).build())
 
-cosine_item_based = EvaluationThread(ac.run_accuracy_evaluation, cosine_item_based_prop)
+evaluations = []
 
-pearson_item_based.start()
-cosine_item_based.start()
-pearson_item_based.join()
-cosine_item_based.join()
+for prop in props:
+    evaluations.append(EvaluationThread(ac.run_accuracy_evaluation, prop))
 
-print_result(pearson_item_based)
-print("=========")
-print_result(cosine_item_based)
+for evaluation in evaluations:
+    evaluation.start()
+
+for evaluation in evaluations:
+    evaluation.join()
+    print_result(evaluation)
+
+#Raw cosine similarity and item-based
+# cosine_item_based_prop = ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+#     .with_ratings_matrix(ratings_matrix, 1) \
+#     .with_is_rated_matrix(is_rated_matrix, 1) \
+#     .with_similarity(similarity.COSINE) \
+#     .with_approach(similarity.ITEM_BASED) \
+#     .with_selection_strategy(selection.select_indices_with_cross_validation) \
+#     .with_train_size(0.95) \
+#     .with_error_measurement(ac.root_mean_squared_error).build()
+#
+# cosine_item_based = EvaluationThread(ac.run_accuracy_evaluation, cosine_item_based_prop)
+
+# pearson_item_based.start()
+# cosine_item_based.start()
+# pearson_item_based.join()
+# cosine_item_based.join()
+
+# print_result(pearson_item_based)
+# print("=========")
+# print_result(cosine_item_based)
+
+#25m dataset from movielens

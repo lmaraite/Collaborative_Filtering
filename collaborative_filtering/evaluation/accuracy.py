@@ -137,6 +137,10 @@ def _run_single_test_case(train_indices, test_indices, eval_props: SinglePredict
         eval_props.ratings_matrix,
         kept_is_rated_matrix
     )
+    if eval_props.approach == similarity.USER_BASED:
+        dataset.rating_matrix = dataset.rating_matrix.T
+        dataset.is_rated_matrix = dataset.is_rated_matrix.T
+
     predictions = []
     actual_ratings = []
 
@@ -160,13 +164,13 @@ def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProper
 
     all_errors = []
 
-    train_test_data_sets = list(map(
+    train_test_data_sets = map(
             lambda indices_tuple: (list(indices_tuple[0]), list(indices_tuple[1])),
             train_test_data_sets
-        ))
+        )
 
     try:
-        # The following two lines can't be easily tested due to limitations of Pickling of Mocks
+        #The following two lines can't be easily tested due to limitations of Pickling of Mocks
         with multiprocessing.Pool() as pool:
             all_errors = pool.starmap(_run_single_test_case,
                 map(

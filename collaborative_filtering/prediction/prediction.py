@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from data import dataset
-from neighborhood import get_nearest_neighbors, has_rated
+from prediction.data import dataset
+from prediction.neighborhood import get_nearest_neighbors, has_rated
 import numpy as np
 
 """
@@ -13,7 +13,7 @@ User based:
     element_id = movie_id
 """
 
-MAX_NEAREST_NEIGHBORS = 5
+MAX_NEAREST_NEIGHBORS = 20
 
 
 def predicition_cosine_similarity(key_id: int, element_id: int, data: dataset) -> tuple:

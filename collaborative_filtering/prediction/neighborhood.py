@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import numpy as np
-from data import dataset
+from prediction.data import dataset
 import math
 
 """
