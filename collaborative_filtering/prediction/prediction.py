@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from prediction.data import dataset
-from prediction.neighborhood import get_nearest_neighbors, has_rated
+from data import dataset
+from neighborhood import get_nearest_neighbors, has_rated
 import numpy as np
 
 """
@@ -40,6 +40,7 @@ def add_pearson_average(key_id: int, nearest_neighbors: list, data: dataset):
         intersection = np.logical_and(data.is_rated_matrix[key_id], data.is_rated_matrix[it.key_id])
         intersected_rating_vector = rating_vector[intersection]
         it.pearson_average = np.average(intersected_rating_vector)
+        it.pearson_average = np.average(rating_vector[data.is_rated_matrix[it.key_id]])
 
 
 def predicition_pearson_correlation(key_id: int, element_id: int, data: dataset) -> tuple:
@@ -52,7 +53,8 @@ def predicition_pearson_correlation(key_id: int, element_id: int, data: dataset)
     """
     nearest_neighbors = get_nearest_neighbors(MAX_NEAREST_NEIGHBORS, key_id, element_id, data)
     add_pearson_average(key_id, nearest_neighbors, data)
-    key_average = np.average(data.rating_matrix[key_id])
+    key_vector = (data.rating_matrix[key_id])[data.is_rated_matrix[key_id]]
+    key_average = np.average(key_vector)
     counter, denominator = 0, 0
     for it in nearest_neighbors:
         counter += it.similarity * (it.rating - it.pearson_average)
