@@ -49,8 +49,6 @@ print_analysis(analysis)
 
 props = []
 
-
-
 props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
     .with_ratings_matrix(ratings_matrix, 1) \
     .with_is_rated_matrix(is_rated_matrix, 1) \

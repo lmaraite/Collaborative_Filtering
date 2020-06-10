@@ -12,8 +12,8 @@ from input.filesystem import read_ratings_matrix, read_is_rated_matrix
 global_start_time = timeit.default_timer()
 
 # Loading R (item_ratings) and Y (is_rated).
-item_based_ratings = read_ratings_matrix()
-is_rated = read_is_rated_matrix()
+item_based_ratings = read_ratings_matrix("/home/dennis/PycharmProjects/Collaborative_Filtering/small-dataset/R.csv")
+is_rated = read_is_rated_matrix("/home/dennis/PycharmProjects/Collaborative_Filtering/small-dataset/Y.csv")
 
 global_elapsed_time = timeit.default_timer() - global_start_time
 print("The program has taken " + str(global_elapsed_time) + " seconds to load the data.")
@@ -36,7 +36,7 @@ for approach in approaches:
         local_start_time = timeit.default_timer()
 
         similarity_matrix = create_similarity_matrix(approach, algorithm, item_based_ratings, is_rated)
-        np.savetxt("../output/" + approach + "_" + algorithm + "_similarity_matrix.csv",
+        np.savetxt("../output/small_" + approach + "_" + algorithm + "_similarity_matrix.csv",
                    similarity_matrix, delimiter=",", fmt="%s")
 
         local_elapsed_time = timeit.default_timer() - local_start_time
