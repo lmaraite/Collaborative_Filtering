@@ -35,7 +35,7 @@ def user_best_ratings(user_ratings: list, count: int) -> list:
 
 
 def get_top_n(user_id: int, n: int) -> list:
-    top_n = get_top_n_list(n, user_id, data, "pearson")
+    top_n = get_top_n_list(n, user_id, data, "pearson", "item")
     formatted_top_n = []
     for movie in top_n:
         formatted_top_n.append((movies[movie[0]], movie[1][0]))
