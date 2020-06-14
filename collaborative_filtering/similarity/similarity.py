@@ -2,33 +2,11 @@ import numpy as np
 import warnings
 from numpy.linalg import norm
 
-# TODO: Implement function to check for invalid input (approach, algorithm).
-
 PEARSON = "pearson"
 ADJUSTED_COSINE = "adjusted_cosine"
 COSINE = "cosine"
 ITEM_BASED = "item_based"
 USER_BASED = "user_based"
-
-"""
-    In order to save computation time during prediction the numbers of the individual co-ratings get saved in an
-    additional matrix. In case of USER_BASED the given matrices get transposed.
-    Returns the whole matrix.
-"""
-def create_number_of_co_ratings_matrix(approach, all_ratings, is_rated):
-    if approach == USER_BASED:
-        all_ratings = all_ratings.T
-        is_rated = is_rated.T
-
-    side_length = all_ratings.shape[0]
-    number_of_co_ratings_matrix = np.full((side_length, side_length), np.nan)
-    for row1 in range(side_length):
-        for row2 in range(row1+1, side_length):
-            co_ratings = get_co_ratings((row1, row2), all_ratings, is_rated)
-            number_of_co_ratings_matrix[row1, row2] = co_ratings.shape[0]
-            number_of_co_ratings_matrix[row2, row1] = number_of_co_ratings_matrix[row1, row2]
-    return number_of_co_ratings_matrix
-
 
 '''
     Creates a similarity-matrix by iterating over all_ratings and saving every similarity at both
