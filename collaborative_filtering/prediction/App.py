@@ -1,11 +1,9 @@
+#!/usr/bin/env python3
 import numpy as np
 from prediction import get_top_n_list
 from data import dataset
 
-similarity_matrix = np.genfromtxt("../../output/item_based_pearson_similarity_matrix.csv", delimiter=",")
-rating_matrix = np.genfromtxt("../../dataset/R.csv", delimiter=",")
-is_rated_matrix = np.genfromtxt("../../dataset/Y.csv", delimiter=",").astype(bool)
-data = dataset(similarity_matrix, rating_matrix, is_rated_matrix)
+
 movies = []
 with open("../../dataset/movie_ids.txt") as file:
     for line in file:
@@ -17,7 +15,7 @@ def has_rated(user_id: int, item_id: int) -> bool:
     return is_rated_matrix[item_id, user_id]
 
 
-def get_rating(user_id:int, item_id: int) -> bool:
+def get_rating(user_id: int, item_id: int) -> bool:
     return rating_matrix[item_id, user_id]
 
 
@@ -34,13 +32,31 @@ def user_best_ratings(user_ratings: list, count: int) -> list:
     return sorted_list[:count]
 
 
-def get_top_n(user_id: int, n: int) -> list:
-    top_n = get_top_n_list(n, user_id, data, "pearson", "item")
+def get_top_n(user_id: int, n: int, algorithm: str, method: str) -> list:
+    top_n = get_top_n_list(n, user_id, data, algorithm, method)
     formatted_top_n = []
     for movie in top_n:
-        formatted_top_n.append((movies[movie[0]], movie[1][0]))
+        rating = movie[1][0]
+        if rating > 5:
+            rating = 5
+        formatted_top_n.append((movies[movie[0]], rating))
     return formatted_top_n
 
+
+alg = input("Algorithm (adjusted_cosine / cosine / pearson): ")
+base = input("Method (item / user): ")
+
+similarity_matrix = np.genfromtxt("../../output/modified_" + base + "_based_" + alg + "_similarity_matrix.csv",
+                                  delimiter=",")
+rating_matrix = np.genfromtxt("../../output/modified_ratings_matrix.csv", delimiter=",")
+is_rated_matrix = np.genfromtxt("../../output/modified_is_rated_matrix.csv", delimiter=",").astype(bool)
+data = dataset(similarity_matrix, rating_matrix, is_rated_matrix)
+
+if alg == "adjusted_cosine":
+    alg = "cosine"
+
+if base == "user":
+    data.similarity_matrix = similarity_matrix.T
 
 while True:
     alice = int(input("Please enter your user id: "))
@@ -49,6 +65,6 @@ while True:
     for movie in user_best_ratings(alice_ratings, 10):
         print(movie)
     print("\nWe would recommend you: ")
-    for movie in get_top_n(alice, 10):
+    for movie in get_top_n(alice, 10, alg, base):
         print(movie)
     print()

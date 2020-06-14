@@ -40,7 +40,7 @@ def add_pearson_average(key_id: int, nearest_neighbors: list, data: dataset):
         intersection = np.logical_and(data.is_rated_matrix[key_id], data.is_rated_matrix[it.key_id])
         intersected_rating_vector = rating_vector[intersection]
         it.pearson_average = np.average(intersected_rating_vector)
-        it.pearson_average = np.average(rating_vector[data.is_rated_matrix[it.key_id]])
+        #  it.pearson_average = np.average(rating_vector[data.is_rated_matrix[it.key_id]])
 
 
 def predicition_pearson_correlation(key_id: int, element_id: int, data: dataset) -> tuple:
