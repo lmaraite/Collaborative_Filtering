@@ -64,16 +64,28 @@ def predicition_pearson_correlation(key_id: int, element_id: int, data: dataset)
     return key_average + counter / denominator, len(nearest_neighbors)
 
 
-def get_top_n_list(n: int, user_id, data: dataset, algorithm: str) -> list:
+def get_top_n_list(n: int, user_id, data: dataset, algorithm: str, base: str) -> list:
     top_n = {}
-    for it in range(0, len(data.rating_matrix)):
-        if not has_rated(it, user_id, data.is_rated_matrix):
-            top_n[it] = 0
-            if algorithm == "cosine":
-                top_n[it] = predicition_cosine_similarity(it, user_id, data)
-            else:
-                top_n[it] = predicition_pearson_correlation(it, user_id, data)
-            if (top_n[it])[1] < MAX_NEAREST_NEIGHBORS:
-                del top_n[it]
+    if base == "item":
+        for it in range(0, len(data.rating_matrix)):
+            if not has_rated(it, user_id, data.is_rated_matrix):
+                top_n[it] = 0
+                if algorithm == "cosine":
+                    top_n[it] = predicition_cosine_similarity(it, user_id, data)
+                else:
+                    top_n[it] = predicition_pearson_correlation(it, user_id, data)
+                if (top_n[it])[1] < MAX_NEAREST_NEIGHBORS:
+                    del top_n[it]
+    else:
+        for it in range(0, len(data.rating_matrix[user_id])):
+            if not has_rated(user_id, it, data.is_rated_matrix):
+                top_n[it] = 0
+                if algorithm == "cosine":
+                    top_n[it] = predicition_cosine_similarity(user_id, it, data)
+                else:
+                    top_n[it] = predicition_pearson_correlation(user_id, it, data)
+                if (top_n[it])[1] < MAX_NEAREST_NEIGHBORS:
+                    del top_n[it]
+
     top_n = sorted(top_n.items(), key=lambda item: item[1], reverse=True)
     return top_n[:n]
