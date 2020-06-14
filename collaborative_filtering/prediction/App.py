@@ -2,7 +2,7 @@ import numpy as np
 from prediction import get_top_n_list
 from data import dataset
 
-similarity_matrix = np.genfromtxt("../../output/item_based_adjusted_cosine_similarity_matrix.csv", delimiter=",")
+similarity_matrix = np.genfromtxt("../../output/item_based_pearson_similarity_matrix.csv", delimiter=",")
 rating_matrix = np.genfromtxt("../../dataset/R.csv", delimiter=",")
 is_rated_matrix = np.genfromtxt("../../dataset/Y.csv", delimiter=",").astype(bool)
 data = dataset(similarity_matrix, rating_matrix, is_rated_matrix)
@@ -35,7 +35,7 @@ def user_best_ratings(user_ratings: list, count: int) -> list:
 
 
 def get_top_n(user_id: int, n: int) -> list:
-    top_n = get_top_n_list(n, user_id, data, "cosine")
+    top_n = get_top_n_list(n, user_id, data, "pearson")
     formatted_top_n = []
     for movie in top_n:
         formatted_top_n.append((movies[movie[0]], movie[1][0]))
@@ -46,9 +46,9 @@ while True:
     alice = int(input("Please enter your user id: "))
     alice_ratings = user_ratings(alice)
     print("Your favourite movies are: ")
-    for movie in user_best_ratings(alice_ratings, 15):
+    for movie in user_best_ratings(alice_ratings, 10):
         print(movie)
     print("\nWe would recommend you: ")
-    for movie in get_top_n(alice, 30):
+    for movie in get_top_n(alice, 10):
         print(movie)
     print()
