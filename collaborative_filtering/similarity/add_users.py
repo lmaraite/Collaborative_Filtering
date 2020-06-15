@@ -27,8 +27,8 @@ raw_ratings_new_user2 = [(0, 5),        # Toy Story
                          (402, 3),      # Batman
                          (464, 5),      # Jungle Book
                          (589, 1),      # Hellraiser: Bloodline
-                         (901, 2),      # Big Lebowski
-                         (1016, 1),     # Con Air
+                         (901, 1),      # Big Lebowski
+                         (1015, 1),     # Con Air
                          (1126, 2)]     # Truman Show
 
 raw_ratings_new_user3 = [(0, 1),        # Toy Story
@@ -42,11 +42,11 @@ raw_ratings_new_user3 = [(0, 1),        # Toy Story
                          (225, 5),      # Die Hard 2
                          (230, 4),      # Batman Returns
                          (312, 1),      # Titanic
-                         (402, 3),      # Batman
+                         (402, 4),      # Batman
                          (464, 1),      # Jungle Book
                          (589, 2),      # Hellraiser: Bloodline
-                         (901, 2),      # Big Lebowski
-                         (1016, 5),     # Con Air
+                         (901, 4),      # Big Lebowski
+                         (1015, 5),     # Con Air
                          (1126, 1)]     # Truman Show
 
 new_users = [raw_ratings_new_user1, raw_ratings_new_user2, raw_ratings_new_user3]
