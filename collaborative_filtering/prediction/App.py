@@ -29,6 +29,9 @@ def user_ratings(user_id: int) -> list:
 
 def user_best_ratings(user_ratings: list, count: int) -> list:
     sorted_list = sorted(user_ratings, key=lambda item: item[1], reverse=True)
+    for item in sorted_list:
+        if item[1] < 3:
+            del item
     return sorted_list[:count]
 
 
