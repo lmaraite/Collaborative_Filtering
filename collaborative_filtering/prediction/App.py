@@ -38,7 +38,7 @@ def get_top_n(user_id: int, n: int, algorithm: str, method: str) -> list:
     for movie in top_n:
         rating = movie[1][0]
         if rating > 5:
-            rating = 5
+            rating = 5.0
         formatted_top_n.append((movies[movie[0]], rating))
     return formatted_top_n
 
