@@ -8,7 +8,7 @@ from evaluation import selection
 from evaluation.accuracy import SinglePredictionAccuracyEvaluationPropertiesBuilder, SinglePredictionAccuracyEvaluationProperties
 from similarity.similarity import PEARSON, COSINE, ITEM_BASED, USER_BASED
 import prediction.prediction as prediction
-from prediction.data import dataset
+from prediction.data import dataset, DatasetBuilder
 
 def assert_are_same_matrices(first_matrix, second_matrix):
     assert first_matrix.shape == second_matrix.shape
@@ -280,7 +280,8 @@ def mock_empty(mocker):
     mocker.patch("evaluation.selection.select_indices_with_hold_out")
     mocker.patch("evaluation.selection.keep_elements_by_index")
     mocker.patch("similarity.similarity.create_similarity_matrix")
-    mocker.patch("prediction.prediction.predicition_cosine_similarity")
+    prediction_mock = mocker.patch("prediction.prediction.predicition_cosine_similarity")
+    prediction_mock.return_value = (None, None)
     mocker.patch("evaluation.accuracy.root_mean_squared_error")
 
 def cross_validation_mock_callback(shape, is_rated_matrix, train_size):
@@ -340,3 +341,28 @@ def test_run_accuracy_evaluation_error_with_multiple_splits(mock_empty, mocker):
     error = ac.run_accuracy_evaluation(eval_props)
     #then
     assert error == 2.75
+
+def test_run_accuracy_evaluation_with_user_based(mock_empty, mocker):
+    #given
+    buildSpy = mocker.spy(DatasetBuilder, "build")
+    withApproachSpy = mocker.spy(DatasetBuilder, "with_approach")
+    withRatingMatrixSpy = mocker.spy(DatasetBuilder, "with_rating_matrix")
+    withIsRatedMatrixSpy = mocker.spy(DatasetBuilder, "with_is_rated_matrix")
+    mocker.patch("statistics.mean")
+
+    eval_props = mocker.patch("evaluation.accuracy.SinglePredictionAccuracyEvaluationProperties")
+    eval_props.approach = USER_BASED
+    eval_props.ratings_matrix = np.array([[2], [4]])
+    eval_props.is_rated_matrix = np.array([[True], [True]])
+    eval_props.selection_strategy = lambda x, y, z: [([(0, 0)], [(1, 0)])]
+    eval_props.prediction_function = prediction.predicition_cosine_similarity
+
+    mocker.patch("evaluation.selection.keep_elements_by_index").return_value = np.array([[False], [True]])
+    #when
+    ac.run_accuracy_evaluation(eval_props)
+    #then
+    buildSpy.assert_called_once()
+    withApproachSpy.assert_called_once_with(mocker.ANY, USER_BASED)
+    withRatingMatrixSpy.assert_called_once_with(mocker.ANY, eval_props.ratings_matrix, 1)
+    assert (withIsRatedMatrixSpy.call_args.args[1] == np.array([[False], [True]])).all()
+    assert withIsRatedMatrixSpy.call_args.args[2] == 1

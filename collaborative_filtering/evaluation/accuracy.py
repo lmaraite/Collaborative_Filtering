@@ -8,7 +8,7 @@ import _pickle
 
 from evaluation import EvaluationProperties, EvaluationPropertiesBuilder, selection
 from similarity import similarity
-import prediction.data as data
+from prediction.data import DatasetBuilder
 import prediction.prediction as prediction
 
 
@@ -132,11 +132,13 @@ def _run_single_test_case(train_indices, test_indices, eval_props: SinglePredict
         kept_is_rated_matrix
     )
 
-    dataset = data.dataset(
-        similarity_matrix,
-        eval_props.ratings_matrix,
-        kept_is_rated_matrix
-    )
+    dataset = DatasetBuilder() \
+        .with_similarity_matrix(similarity_matrix) \
+        .with_rating_matrix(eval_props.ratings_matrix, 1) \
+        .with_is_rated_matrix(kept_is_rated_matrix, 1) \
+        .with_approach(eval_props.approach) \
+        .build()
+
     predictions = []
     actual_ratings = []
 
