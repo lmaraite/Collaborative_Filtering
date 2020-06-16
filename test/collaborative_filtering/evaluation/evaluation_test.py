@@ -164,6 +164,7 @@ class EvaluationPropertiesBuilderTest(unittest.TestCase):
         #then
         assert (evaluation_properties_builder.is_rated_matrix == is_rated_matrix).all()
 
+
 def test_analyse_data_set():
     #given
     ratings_matrix = np.array([

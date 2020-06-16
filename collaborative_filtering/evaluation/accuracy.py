@@ -164,12 +164,13 @@ def run_accuracy_evaluation(eval_props: SinglePredictionAccuracyEvaluationProper
 
     all_errors = []
 
-    train_test_data_sets = list(map(
+    train_test_data_sets = map(
             lambda indices_tuple: (list(indices_tuple[0]), list(indices_tuple[1])),
             train_test_data_sets
-        ))
+        )
 
     try:
+        #The following two lines can't be easily tested due to limitations of Pickling of Mocks
         with multiprocessing.Pool() as pool:
             all_errors = pool.starmap(_run_single_test_case,
                 map(

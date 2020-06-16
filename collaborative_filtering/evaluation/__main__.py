@@ -49,7 +49,7 @@ print_analysis(analysis)
 
 props = []
 
-for q in [5]:
+for q in [5, 10, 20]:
     num_of_ratings = analysis["num_of_ratings"]
     props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
         .with_ratings_matrix(ratings_matrix, 1) \
@@ -119,7 +119,7 @@ for evaluation in evaluations:
     print_result(evaluation)
 
 props = []
-for q in []:
+for q in [3, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90]:
     num_of_ratings = analysis["num_of_ratings"]
     props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
         .with_ratings_matrix(ratings_matrix, 1) \
