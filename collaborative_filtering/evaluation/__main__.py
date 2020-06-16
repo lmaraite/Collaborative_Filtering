@@ -38,10 +38,10 @@ def print_analysis(analysis):
 #dat set from ilias
 data_set_dir = os.path.join(os.path.dirname(__file__), "..", "..", "dataset")
 ratings_matrix = filesystem.read_ratings_matrix(
-    # os.path.join(data_set_dir, "movielens_100k_converted.csv")
+    os.path.join(data_set_dir, "movielens_100k_converted.csv")
 ) # movie x user matrix
 is_rated_matrix = filesystem.read_is_rated_matrix(
-    # os.path.join(data_set_dir, "movielens_100k_converted_is_rated.csv")
+    os.path.join(data_set_dir, "movielens_100k_converted_is_rated.csv")
 )
 
 analysis = evaluation.analyse_data_set(ratings_matrix, is_rated_matrix, 1)
@@ -49,23 +49,62 @@ print_analysis(analysis)
 
 props = []
 
-props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
-    .with_ratings_matrix(ratings_matrix, 1) \
-    .with_is_rated_matrix(is_rated_matrix, 1) \
-    .with_similarity(similarity.PEARSON) \
-    .with_approach(similarity.ITEM_BASED) \
-    .with_selection_strategy(selection.select_indices_with_hold_out) \
-    .with_train_size(0.8) \
-    .with_error_measurement(ac.mean_absolute_error).build())
+for q in [5]:
+    num_of_ratings = analysis["num_of_ratings"]
+    props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+        .with_ratings_matrix(ratings_matrix, 1) \
+        .with_is_rated_matrix(is_rated_matrix, 1) \
+        .with_similarity(similarity.COSINE) \
+        .with_approach(similarity.USER_BASED) \
+        .with_selection_strategy(selection.select_indices_with_cross_validation) \
+        .with_train_size(1 - ((num_of_ratings / q) / num_of_ratings)) \
+        .with_error_measurement(ac.mean_absolute_error).build())
 
-props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
-    .with_ratings_matrix(ratings_matrix, 1) \
-    .with_is_rated_matrix(is_rated_matrix, 1) \
-    .with_similarity(similarity.PEARSON) \
-    .with_approach(similarity.USER_BASED) \
-    .with_selection_strategy(selection.select_indices_with_hold_out) \
-    .with_train_size(0.8) \
-    .with_error_measurement(ac.mean_absolute_error).build())
+    props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+        .with_ratings_matrix(ratings_matrix, 1) \
+        .with_is_rated_matrix(is_rated_matrix, 1) \
+        .with_similarity(similarity.COSINE) \
+        .with_approach(similarity.ITEM_BASED) \
+        .with_selection_strategy(selection.select_indices_with_cross_validation) \
+        .with_train_size(1 - ((num_of_ratings / q) / num_of_ratings)) \
+        .with_error_measurement(ac.mean_absolute_error).build())
+
+    props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+        .with_ratings_matrix(ratings_matrix, 1) \
+        .with_is_rated_matrix(is_rated_matrix, 1) \
+        .with_similarity(similarity.ADJUSTED_COSINE) \
+        .with_approach(similarity.USER_BASED) \
+        .with_selection_strategy(selection.select_indices_with_cross_validation) \
+        .with_train_size(1 - ((num_of_ratings / q) / num_of_ratings)) \
+        .with_error_measurement(ac.mean_absolute_error).build())
+
+    props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+        .with_ratings_matrix(ratings_matrix, 1) \
+        .with_is_rated_matrix(is_rated_matrix, 1) \
+        .with_similarity(similarity.ADJUSTED_COSINE) \
+        .with_approach(similarity.ITEM_BASED) \
+        .with_selection_strategy(selection.select_indices_with_cross_validation) \
+        .with_train_size(1 - ((num_of_ratings / q) / num_of_ratings)) \
+        .with_error_measurement(ac.mean_absolute_error).build())
+
+    props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+        .with_ratings_matrix(ratings_matrix, 1) \
+        .with_is_rated_matrix(is_rated_matrix, 1) \
+        .with_similarity(similarity.PEARSON) \
+        .with_approach(similarity.USER_BASED) \
+        .with_selection_strategy(selection.select_indices_with_cross_validation) \
+        .with_train_size(1 - ((num_of_ratings / q) / num_of_ratings)) \
+        .with_error_measurement(ac.mean_absolute_error).build())
+
+    props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+        .with_ratings_matrix(ratings_matrix, 1) \
+        .with_is_rated_matrix(is_rated_matrix, 1) \
+        .with_similarity(similarity.PEARSON) \
+        .with_approach(similarity.ITEM_BASED) \
+        .with_selection_strategy(selection.select_indices_with_cross_validation) \
+        .with_train_size(1 - ((num_of_ratings / q) / num_of_ratings)) \
+        .with_error_measurement(ac.mean_absolute_error).build())
+
 
 evaluations = []
 
@@ -79,25 +118,23 @@ for evaluation in evaluations:
     evaluation.join()
     print_result(evaluation)
 
-#Raw cosine similarity and item-based
-# cosine_item_based_prop = ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
-#     .with_ratings_matrix(ratings_matrix, 1) \
-#     .with_is_rated_matrix(is_rated_matrix, 1) \
-#     .with_similarity(similarity.COSINE) \
-#     .with_approach(similarity.ITEM_BASED) \
-#     .with_selection_strategy(selection.select_indices_with_cross_validation) \
-#     .with_train_size(0.95) \
-#     .with_error_measurement(ac.root_mean_squared_error).build()
-#
-# cosine_item_based = EvaluationThread(ac.run_accuracy_evaluation, cosine_item_based_prop)
+props = []
+for q in []:
+    num_of_ratings = analysis["num_of_ratings"]
+    props.append(ac.SinglePredictionAccuracyEvaluationPropertiesBuilder() \
+        .with_ratings_matrix(ratings_matrix, 1) \
+        .with_is_rated_matrix(is_rated_matrix, 1) \
+        .with_similarity(similarity.COSINE) \
+        .with_approach(similarity.USER_BASED) \
+        .with_selection_strategy(selection.select_indices_with_cross_validation) \
+        .with_train_size(1 - ((num_of_ratings / q) / num_of_ratings)) \
+        .with_error_measurement(ac.mean_absolute_error).build())
 
-# pearson_item_based.start()
-# cosine_item_based.start()
-# pearson_item_based.join()
-# cosine_item_based.join()
+evaluations = []
+for prop in props:
+    evaluations.append(EvaluationThread(ac.run_accuracy_evaluation, prop))
 
-# print_result(pearson_item_based)
-# print("=========")
-# print_result(cosine_item_based)
-
-#25m dataset from movielens
+for evaluation in evaluations:
+    evaluation.start()
+    evaluation.join()
+    print_result(evaluation)
