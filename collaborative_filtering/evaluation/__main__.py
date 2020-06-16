@@ -14,7 +14,7 @@ import evaluation
 from evaluation import accuracy as ac
 from evaluation import selection
 from input import filesystem
-from similarity import similarity
+import similarity
 
 class EvaluationThread(threading.Thread):
     def __init__(self, evaluation_function, evaluation_props):

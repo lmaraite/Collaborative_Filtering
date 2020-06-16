@@ -5,7 +5,6 @@ import math
 
 import evaluation
 from evaluation import EvaluationPropertiesBuilder
-from similarity.similarity import ITEM_BASED
 
 class EvaluationPropertiesBuilderTest(unittest.TestCase):
 
@@ -14,46 +13,33 @@ class EvaluationPropertiesBuilderTest(unittest.TestCase):
     def test_builder_should_throw_error_without_is_rated_matrix(self):
         with pytest.raises(ValueError):
             EvaluationPropertiesBuilder() \
-                .with_ratings_matrix(np.array([]), 0) \
+                .with_ratings_matrix(np.array([])) \
                 .with_similarity("test") \
                 .with_selection_strategy(self.dummy_function) \
-                .with_approach("") \
                 .build()
 
     def test_builder_should_throw_error_without_ratings_matrix(self):
         with pytest.raises(ValueError):
             EvaluationPropertiesBuilder() \
-                .with_is_rated_matrix(np.array([]), 0) \
+                .with_is_rated_matrix(np.array([])) \
                 .with_similarity("test") \
                 .with_selection_strategy(self.dummy_function) \
-                .with_approach("") \
                 .build()
 
     def test_builder_should_throw_error_without_similarity(self):
         with pytest.raises(ValueError):
             EvaluationPropertiesBuilder() \
-                .with_is_rated_matrix(np.array([]), 0) \
-                .with_ratings_matrix(np.array([]), 0) \
+                .with_is_rated_matrix(np.array([])) \
+                .with_ratings_matrix(np.array([])) \
                 .with_selection_strategy(self.dummy_function) \
-                .with_approach("") \
                 .build()
 
     def test_build_should_trow_error_without_selection_strategy(self):
         with pytest.raises(ValueError):
             EvaluationPropertiesBuilder() \
-                .with_is_rated_matrix(np.array([]), 0) \
-                .with_ratings_matrix(np.array([]), 0) \
+                .with_is_rated_matrix(np.array([])) \
+                .with_ratings_matrix(np.array([])) \
                 .with_similarity("test") \
-                .with_approach("") \
-                .build()
-
-    def test_build_should_throw_error_without_approach(self):
-        with pytest.raises(ValueError):
-            EvaluationPropertiesBuilder() \
-                .with_is_rated_matrix(np.array([]), 0) \
-                .with_ratings_matrix(np.array([]), 0) \
-                .with_similarity("test") \
-                .with_selection_strategy(self.dummy_function) \
                 .build()
 
     def test_builder_should_throw_error_for_negative_train_size(self):
@@ -80,12 +66,11 @@ class EvaluationPropertiesBuilderTest(unittest.TestCase):
         ])
         #when
         evaluation_properties = EvaluationPropertiesBuilder() \
-            .with_ratings_matrix(ratings_matrix, 1) \
-            .with_is_rated_matrix(is_rated, 1) \
+            .with_ratings_matrix(ratings_matrix) \
+            .with_is_rated_matrix(is_rated) \
             .with_similarity("testSimilarity") \
             .with_selection_strategy(self.dummy_function) \
             .with_train_size(0.5) \
-            .with_approach(ITEM_BASED) \
             .build()
 
         #then
