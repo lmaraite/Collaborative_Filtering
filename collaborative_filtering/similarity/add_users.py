@@ -6,48 +6,72 @@ import numpy as np
 from input.filesystem import read_ratings_matrix, read_is_rated_matrix
 
 # The ratings of the new users are saved in a lists of tuples.
-raw_ratings_new_user1 = [(221, 5),      # Star Trek: First Contact
-                         (226, 5),      # Star Trek VI
-                         (227, 5),      # Star Trek: Khan
-                         (110, 1),      # Truth about cats and dogs
-                         (120, 1),      # Independence Day
-                         (85, 1)]       # Remains of the Day
+raw_ratings_new_user1 = [(0, 5),    # Toy Story
+                         (49, 5),   # Star Wars
+                         (55, 2),   # Pulp Fiction
+                         (61, 3),   # Stargate
+                         (68, 4),   # Forrest Gump
+                         (77, 4),   # Free Willy
+                         (81, 2),   # Jurassic Park
+                         (82, 2),   # Much Ado About Nothing
+                         (93, 4),   # Home Alone
+                         (95, 4),   # Terminator 2
+                         (116, 5),  # The Rock
+                         (143, 4),  # Die Hard
+                         (153, 3),  # Life of Brian
+                         (154, 5),  # Dirty Dancing
+                         (160, 2),  # Top Gun
+                         (171, 5),  # Empire Strikes Back
+                         (173, 4),  # Raiders of the lost Ark
+                         (180, 5),  # Return of the Jedi
+                         (184, 4),  # Psycho
+                         (194, 4),  # Terminator 1
+                         (203, 5),  # Back to the Future
+                         (209, 5),  # Indiana Jones 3
+                         (225, 4),  # Die Hard 2
+                         (248, 2),  # Austin Powers
+                         (271, 2),  # Good Will Hunting
+                         (312, 4),  # Titanic
+                         (317, 2),  # Schindler's List
+                         (392, 3),  # Mrs. Doubtfire
+                         (398, 4),  # Three Musketeers
+                         (404, 4)]  # Mission Impossible
 
-raw_ratings_new_user2 = [(0, 5),        # Toy Story
-                         (16, 1),       # From Dusk Till Dawn
-                         (55, 1),       # Pulp Fiction
-                         (70, 5),       # Lion King
-                         (94, 5),       # Aladdin
-                         (143, 1),      # Die Hard
-                         (216, 1),      # Bram Stokers Dracula
-                         (218, 1),      # Nightmare on Elm Street
-                         (225, 1),      # Die Hard 2
-                         (230, 3),      # Batman Returns
-                         (312, 2),      # Titanic
-                         (402, 3),      # Batman
-                         (464, 5),      # Jungle Book
-                         (589, 1),      # Hellraiser: Bloodline
-                         (901, 1),      # Big Lebowski
-                         (1015, 1),     # Con Air
-                         (1126, 2)]     # Truman Show
+raw_ratings_new_user2 = [(0, 5),  # Toy Story
+                         (16, 1),  # From Dusk Till Dawn
+                         (55, 1),  # Pulp Fiction
+                         (70, 5),  # Lion King
+                         (94, 5),  # Aladdin
+                         (143, 1),  # Die Hard
+                         (216, 1),  # Bram Stokers Dracula
+                         (218, 1),  # Nightmare on Elm Street
+                         (225, 1),  # Die Hard 2
+                         (230, 3),  # Batman Returns
+                         (312, 2),  # Titanic
+                         (402, 3),  # Batman
+                         (464, 5),  # Jungle Book
+                         (589, 1),  # Hellraiser: Bloodline
+                         (901, 1),  # Big Lebowski
+                         (1015, 1),  # Con Air
+                         (1126, 2)]  # Truman Show
 
-raw_ratings_new_user3 = [(0, 1),        # Toy Story
-                         (16, 5),       # From Dusk Till Dawn
-                         (55, 5),       # Pulp Fiction
-                         (70, 1),       # Lion King
-                         (94, 1),       # Aladdin
-                         (143, 5),      # Die Hard
-                         (216, 3),      # Bram Stokers Dracula
-                         (218, 3),      # Nightmare on Elm Street
-                         (225, 5),      # Die Hard 2
-                         (230, 4),      # Batman Returns
-                         (312, 1),      # Titanic
-                         (402, 4),      # Batman
-                         (464, 1),      # Jungle Book
-                         (589, 2),      # Hellraiser: Bloodline
-                         (901, 4),      # Big Lebowski
-                         (1015, 5),     # Con Air
-                         (1126, 1)]     # Truman Show
+raw_ratings_new_user3 = [(0, 1),  # Toy Story
+                         (16, 5),  # From Dusk Till Dawn
+                         (55, 5),  # Pulp Fiction
+                         (70, 1),  # Lion King
+                         (94, 1),  # Aladdin
+                         (143, 5),  # Die Hard
+                         (216, 3),  # Bram Stokers Dracula
+                         (218, 3),  # Nightmare on Elm Street
+                         (225, 5),  # Die Hard 2
+                         (230, 4),  # Batman Returns
+                         (312, 1),  # Titanic
+                         (402, 4),  # Batman
+                         (464, 1),  # Jungle Book
+                         (589, 2),  # Hellraiser: Bloodline
+                         (901, 4),  # Big Lebowski
+                         (1015, 5),  # Con Air
+                         (1126, 1)]  # Truman Show
 
 new_users = [raw_ratings_new_user1, raw_ratings_new_user2, raw_ratings_new_user3]
 
